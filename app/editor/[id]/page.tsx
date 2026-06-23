@@ -114,7 +114,7 @@ export default function EditorPage() {
   }
 
   return (
-    <main className="min-h-screen bg-paper overflow-y-auto w-full">
+    <main className="min-h-screen">
       <TitleBar
         title={title}
         wordCount={wordCount}
@@ -122,18 +122,12 @@ export default function EditorPage() {
         saveState={saveState}
         onTitleChange={handleTitleChange}
       />
-        <div className="relative w-full max-w-4xl mx-auto px-4 py-8">
-        {/* Isolated workspace surface box */}
-        <div className="relative min-h-[500px] w-full border border-rule rounded-lg bg-white p-6 shadow-sm">
-          <EditorCanvas
+      <EditorCanvas
         holderId={`editorjs-${id}`}
         documentId={id}
         initialData={initialData}
         onChange={handleContentChange}
       />
-        </div> 
-      </div>
-      
       <Toolbar documentId={id} title={title} getContent={getContent} />
     </main>
   );
