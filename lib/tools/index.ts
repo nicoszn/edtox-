@@ -48,7 +48,6 @@ const asTune = (tool: unknown) => tool as BlockTuneConstructable;
  */
 export function buildEditorTools(documentId: string) {
   return {
-    return {
   // ---------- BLOCK TOOLS ----------
   paragraph: {
     class: Paragraph,
@@ -146,7 +145,6 @@ export function buildEditorTools(documentId: string) {
   },
 };
 
-  };
 }
 
 //export const ALL_TUNES = ["alignment", "footnotes"];
