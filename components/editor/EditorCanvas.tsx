@@ -6,17 +6,16 @@ import { EditorOrchestrator } from "@/lib/orchestrator";
 
 export default function EditorCanvas({
   holderId,
+  documentId,
   initialData,
   onChange,
 }: {
   holderId: string;
+  documentId: string;
   initialData: OutputData;
   onChange: (data: OutputData) => void;
 }) {
   const orchestratorRef = useRef<EditorOrchestrator | null>(null);
-  // initialData/onChange are read once at mount; the orchestrator owns the
-  // instance after that, so we intentionally don't re-run this effect on
-  // every change (that would tear down and reinit the editor on each save).
   const initialDataRef = useRef(initialData);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -24,6 +23,7 @@ export default function EditorCanvas({
   useEffect(() => {
     const orchestrator = new EditorOrchestrator({
       holderId,
+      documentId,
       initialData: initialDataRef.current,
       onChange: (data) => onChangeRef.current(data),
       placeholder: "Start writing…",
@@ -36,7 +36,12 @@ export default function EditorCanvas({
       orchestratorRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [holderId]);
+  }, [holderId, documentId]);
 
-  return <div id={holderId} className="px-4 pt-6 pb-32 sm:px-6 sm:pt-8 max-w-3xl mx-auto" />;
+  return (
+    <div
+      id={holderId}
+      className="px-4 pt-6 pb-32 sm:px-6 sm:pt-8 max-w-3xl mx-auto print:px-0 print:pb-0 print:max-w-none"
+    />
+  );
 }
