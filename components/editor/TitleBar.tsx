@@ -7,12 +7,14 @@ const WORD_TARGET_DEFAULT = 500;
 export default function TitleBar({
   title,
   wordCount,
+  pageCount,
   saveState,
   onTitleChange,
   target = WORD_TARGET_DEFAULT,
 }: {
   title: string;
   wordCount: number;
+  pageCount: number;
   saveState: "idle" | "saving" | "saved";
   onTitleChange: (title: string) => void;
   target?: number;
@@ -21,7 +23,7 @@ export default function TitleBar({
   const progress = Math.min(100, Math.round((wordCount / target) * 100));
 
   return (
-    <div className="sticky top-0 z-10 bg-[var(--color-paper)]/95 backdrop-blur-sm border-b border-[var(--color-rule)]">
+    <div className="sticky top-0 z-10 bg-[var(--color-paper)]/95 backdrop-blur-sm border-b border-[var(--color-rule)] print:hidden">
       <div className="flex items-center gap-3 px-4 pt-3 sm:px-6">
         <button
           onClick={() => router.push("/")}
@@ -56,6 +58,9 @@ export default function TitleBar({
         </div>
         <span className="shrink-0 text-xs font-[family-name:var(--font-mono)] text-[var(--color-ink-soft)] tabular-nums">
           {wordCount} / {target}
+        </span>
+        <span className="shrink-0 text-xs font-[family-name:var(--font-mono)] text-[var(--color-ink-soft)] tabular-nums border-l border-[var(--color-rule)] pl-3">
+          {pageCount} {pageCount === 1 ? "page" : "pages"}
         </span>
       </div>
     </div>
