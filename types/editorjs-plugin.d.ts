@@ -52,3 +52,51 @@ declare module '@editorjs/citation' {
   const Citation: BlockToolConstructable;
   export default Citation;
 }
+
+declare module '@editorjs/paragraph' {
+  import { BlockToolConstructable } from '@editorjs/editorjs';
+  const Paragraph: BlockToolConstructable;
+  export default Paragraph;
+}
+
+declare module '@editorjs/underline' {
+  import { InlineToolConstructable } from '@editorjs/editorjs';
+  const Underline: InlineToolConstructable;
+  export default Underline;
+}
+
+declare module '@editorjs/image' {
+  import { BlockToolConstructable } from '@editorjs/editorjs';
+  const ImageTool: BlockToolConstructable;
+  export default Image;
+}
+
+declare module '@editorjs/attaches' {
+  import { BlockToolConstructable } from '@editorjs/editorjs';
+  const AttachesTool: BlockToolConstructable;
+  export default Attaches;
+}
+
+declare module '@editorjs/footnotes' {
+  import { BlockTuneConstructable } from '@editorjs/editorjs';
+  const FootnotesTune: BlockTuneConstructable;
+  export default Footnotes;
+}
+
+declare module '@phigoro/editorjs-toc' {
+  import { BlockToolConstructable } from '@editorjs/editorjs';
+  const TOC: BlockToolConstructable;
+  export default TOC;
+}
+
+declare module 'editorjs-text-alignment-blocktune' {
+  import { BlockTuneConstructable } from '@editorjs/editorjs';
+  const AlignmentTune: BlockTuneConstructable;
+  export default Alignment;
+}
+
+declare module 'editorjs-mathcyou' {
+  import { InlineToolConstructable, BlockToolConstructable } from '@editorjs/editorjs';
+  export const InlineMathTool: InlineToolConstructable;
+  export const MathBlock: BlockToolConstructable;
+}
