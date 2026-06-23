@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { OutputData } from "@editorjs/editorjs";
 import { EditorOrchestrator } from "@/lib/orchestrator";
-
+import "@/styles/editor.css"
 export default function EditorCanvas({
   holderId,
   documentId,
@@ -41,7 +41,7 @@ export default function EditorCanvas({
   return (
     <div
       id={holderId}
-      className="px-4 pt-6 pb-32 sm:px-6 sm:pt-8 max-w-3xl mx-auto prose print:px-0 print:pb-0 print:max-w-none"
+      className="min-h-[500px] h-full w-full text-left indent-2 px-4 pt-6 pb-32 sm:px-6 sm:pt-8 max-w-3xl mx-auto prose print:px-0 print:pb-0 print:max-w-none"
     />
   );
 }
