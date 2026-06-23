@@ -12,9 +12,7 @@ import Underline from "@editorjs/underline";
 import ImageTool from "@editorjs/image";
 import AttachesTool from "@editorjs/attaches";
 import FootnotesTune from "@editorjs/footnotes";
-// @ts-expect-error -- package ships no types; CommonJS default export
 import TOC from "@phigoro/editorjs-toc";
-// @ts-expect-error -- package ships no types
 import AlignmentTune from "editorjs-text-alignment-blocktune";
 import { InlineMathTool, MathBlockTool } from "editorjs-mathcyou";
 import katex from "katex";
