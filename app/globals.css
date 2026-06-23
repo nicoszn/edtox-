@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root {
+@theme {
   --color-paper: #fafaf8;
   --color-ink: #1a1a18;
   --color-ink-soft: #5a5650;
@@ -15,6 +15,7 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
+@layer base {
 * {
   box-sizing: border-box;
 }
@@ -32,6 +33,8 @@ body {
   outline-offset: 2px;
   border-radius: 2px;
 }
+}
+  
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -43,7 +46,7 @@ body {
 }
 
 /* ---------- Editor.js surface ---------- */
-
+@layer utilities {
 .codex-editor {
   font-family: var(--font-body);
   color: var(--color-ink);
@@ -281,6 +284,7 @@ code {
 .cdx-attaches {
   border: 1px solid var(--color-rule);
   border-radius: 6px;
+}
 }
 
 /* ---------- Print (PDF export path) ---------- */
