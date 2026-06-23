@@ -116,6 +116,25 @@
     color: var(--color-umber) !important;
     background-color: rgba(139, 90, 60, 0.08) !important;
   }
+
+    /* Push the last items up by adding internal base padding */
+  .ce-popover__items {
+    padding-bottom: 12px !important; 
+    max-height: 320px !important; /* Prevents the menu from rendering too low on the screen */
+    overflow-y: auto !important;   /* Safely scrolls items if they exceed the max height */
+  }
+
+  /* Optional: Make the scrollbar look clean and minimalist */
+  .ce-popover__items::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .ce-popover__items::-webkit-scrollbar-thumb {
+    background: var(--color-rule);
+    border-radius: 4px;
+  }
+
+  
   .ce-popover-item--active {
     color: var(--color-umber);
   }
