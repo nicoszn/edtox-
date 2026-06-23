@@ -41,7 +41,7 @@ export default function EditorCanvas({
   return (
     <div
       id={holderId}
-      className="px-4 pt-6 pb-32 sm:px-6 sm:pt-8 max-w-3xl mx-auto print:px-0 print:pb-0 print:max-w-none"
+      className="px-4 pt-6 pb-32 sm:px-6 sm:pt-8 max-w-3xl mx-auto prose print:px-0 print:pb-0 print:max-w-none"
     />
   );
 }
