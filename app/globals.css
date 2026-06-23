@@ -278,6 +278,36 @@
     border-radius: 6px;
   }
 
+    /* Fix Tailwind overriding Editor.js heading sizes */
+  .ce-header {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.25;
+  }
+
+  h1.ce-header {
+    font-size: 2.25rem; /* ~36px */
+  }
+
+  h2.ce-header {
+    font-size: 1.875rem; /* ~30px */
+  }
+
+  h3.ce-header {
+    font-size: 1.5rem; /* ~24px */
+  }
+
+  h4.ce-header {
+    font-size: 1.25rem; /* ~20px */
+  }
+
+  h5.ce-header {
+    font-size: 1.125rem; /* ~18px */
+  }
+
   /* ---------- Print (PDF export path) ---------- */
   @media print {
     body {
