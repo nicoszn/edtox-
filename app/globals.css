@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 @theme {
-  ::root {
   --color-paper: #fafaf8;
   --color-ink: #1a1a18;
   --color-ink-soft: #5a5650;
@@ -14,7 +13,6 @@
   --font-display: "Fraunces", serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-}
 }
 
 @layer base {
@@ -35,7 +33,7 @@ body {
   outline-offset: 2px;
   border-radius: 2px;
 }
-
+}
   
 
 @media (prefers-reduced-motion: reduce) {
@@ -47,28 +45,6 @@ body {
   }
 }
 
-  @media print {
-  body {
-    background: white;
-  }
-
-  .pagebreak-block {
-    break-after: page;
-  }
-
-  .pagebreak-line,
-  .pagebreak-label {
-    display: none;
-  }
-
-  .ce-toolbar,
-  .ce-block--selected,
-  .codex-editor--narrow .ce-toolbar {
-    display: none !important;
-  }
-}
-
-}
 /* ---------- Editor.js surface ---------- */
 @layer utilities {
 .codex-editor {
@@ -312,3 +288,24 @@ code {
 }
 
 /* ---------- Print (PDF export path) ---------- */
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .pagebreak-block {
+    break-after: page;
+  }
+
+  .pagebreak-line,
+  .pagebreak-label {
+    display: none;
+  }
+
+  .ce-toolbar,
+  .ce-block--selected,
+  .codex-editor--narrow .ce-toolbar {
+    display: none !important;
+  }
+}
