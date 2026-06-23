@@ -20,6 +20,8 @@ import "katex/dist/katex.min.css";
 import Citation from "@/lib/tools/citation";
 import PageBreak from "@/lib/tools/pagebreak";
 import SimpleLink from "@/lib/tools/simplelink";
+import MermaidBlock from "@/lib/tools/mermaid";
+
 import { createIndexedDbUploader, createAttachesUploader } from "@/lib/storage/uploader";
 
 if (typeof window !== "undefined") {
@@ -132,6 +134,10 @@ export function buildEditorTools(documentId: string) {
   },
   inlineMath: { 
     class: InlineMathTool 
+  },
+
+    mermaid: {
+    class: MermaidBlock
   },
 
   // ---------- BLOCK TUNES ----------
