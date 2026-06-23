@@ -48,72 +48,105 @@ const asTune = (tool: unknown) => tool as BlockTuneConstructable;
  */
 export function buildEditorTools(documentId: string) {
   return {
-    paragraph: {
-      class: Paragraph,
-      inlineToolbar: true,
-      tunes: ["alignment"],
-    },
-    header: {
-    class: Header,
-    config: { levels: [1, 2, 3, 4, 5], defaultLevel: 2, placeholder: "Heading" },
+    return {
+  // ---------- BLOCK TOOLS ----------
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: true,
     tunes: ["alignment"],
   },
-    list: {
-      class: asBlockTool(EditorjsList),
-      inlineToolbar: true,
-      config: { defaultStyle: "unordered" },
-      tunes: ["alignment"],
+  header: {
+    class: Header,
+    inlineToolbar: true,
+    config: { 
+      levels:, 
+      defaultLevel: 2, 
+      placeholder: "Heading" 
     },
-    quote: {
-      class: asBlockTool(Quote),
-      inlineToolbar: true,
-      config: { quotePlaceholder: "Quote", captionPlaceholder: "Attribution" },
-      tunes: ["alignment", "footnotes"],
+    tunes: ["alignment"],
+  },
+  list: {
+    class: EditorjsList,
+    inlineToolbar: true,
+    config: { defaultStyle: "unordered" },
+    tunes: ["alignment"],
+  },
+  quote: {
+    class: Quote,
+    inlineToolbar: true,
+    config: { 
+      quotePlaceholder: "Quote", 
+      captionPlaceholder: "Attribution" 
     },
-    code: { class: asBlockTool(Code) },
-    table: {
-      class: asBlockTool(Table),
-      inlineToolbar: true,
-      config: { rows: 2, cols: 2 },
-      tunes: ["alignment"],
+    tunes: ["alignment", "footnotes"],
+  },
+  code: { 
+    class: Code 
+  },
+  table: {
+    class: Table,
+    inlineToolbar: true,
+    config: { rows: 2, cols: 2 },
+    tunes: ["alignment"],
+  },
+  delimiter: {
+    class: Delimiter
+  },
+  image: {
+    class: ImageTool,
+    config: {
+      uploader: createIndexedDbUploader(documentId),
     },
-    delimiter: asBlockTool(Delimiter),
-    inlineCode: asInlineTool(InlineCode),
-    marker: asInlineTool(Marker),
-    underline: asInlineTool(Underline),
+    tunes: ["alignment"],
+  },
+  attaches: {
+    class: AttachesTool,
+    config: {
+      uploader: createAttachesUploader(documentId),
+    },
+  },
+  linkTool: { 
+    class: SimpleLink 
+  },
+  mathBlock: { 
+    class: MathBlockTool 
+  },
+  toc: { 
+    class: TOC 
+  },
+  citation: { 
+    class: Citation 
+  },
+  pagebreak: { 
+    class: PageBreak 
+  },
 
-    image: {
-      class: asBlockTool(ImageTool),
-      config: {
-        uploader: createIndexedDbUploader(documentId),
-      },
-      tunes: ["alignment"],
-    },
-    attaches: {
-      class: asBlockTool(AttachesTool),
-      config: {
-        uploader: createAttachesUploader(documentId),
-      },
-    },
-    linkTool: { class: asBlockTool(SimpleLink) },
+  // ---------- INLINE TOOLS ----------
+  inlineCode: {
+    class: InlineCode
+  },
+  marker: {
+    class: Marker
+  },
+  underline: {
+    class: Underline
+  },
+  inlineMath: { 
+    class: InlineMathTool 
+  },
 
-    inlineMath: { class: asInlineTool(InlineMathTool) },
-    mathBlock: { class: asBlockTool(MathBlockTool) },
+  // ---------- BLOCK TUNES ----------
+  footnotes: {
+    class: FootnotesTune,
+    config: { placeholder: "Footnote text" },
+  },
+  alignment: {
+    class: AlignmentTune,
+    config: { default: "left" },
+  },
+};
 
-    toc: { class: asBlockTool(TOC) },
-
-    footnotes: {
-      class: asTune(FootnotesTune),
-      config: { placeholder: "Footnote text" },
-    },
-    alignment: {
-      class: asTune(AlignmentTune),
-      config: { default: "left" },
-    },
-
-    citation: { class: asBlockTool(Citation) },
-    pagebreak: { class: asBlockTool(PageBreak) },
   };
 }
 
-export const ALL_TUNES = ["alignment", "footnotes"];
+//export const ALL_TUNES = ["alignment", "footnotes"];
