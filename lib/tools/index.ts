@@ -55,7 +55,7 @@ export function buildEditorTools(documentId: string) {
     },
     header: {
     class: Header,
-    config: { levels: [1, 2, 3], defaultLevel: 2, placeholder: "Heading" },
+    config: { levels: [1, 2, 3, 4, 5], defaultLevel: 2, placeholder: "Heading" },
     tunes: ["alignment"],
   },
     list: {
