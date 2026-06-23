@@ -51,12 +51,12 @@ export function buildEditorTools(documentId: string) {
   // ---------- BLOCK TOOLS ----------
   paragraph: {
     class: Paragraph,
-    inlineToolbar: true,
+    inlineToolbar: ["bold", "italic", "underline", "marker", "inlineMath"],
     tunes: ["alignment"],
   },
   header: {
     class: Header,
-    inlineToolbar: true,
+    inlineToolbar: ["bold", "italic", "underline"],
     config: { 
       levels: [1, 2, 3, 4, 5], 
       defaultLevel: 2, 
