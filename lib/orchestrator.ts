@@ -26,6 +26,7 @@ export class EditorOrchestrator {
       holder: this.options.holderId,
       tools: buildEditorTools(this.options.documentId),
       data: hydrated,
+      defaultBlock: "paragraph",
       placeholder: this.options.placeholder ?? "Start writing…",
       autofocus: false,
       onChange: async () => {
