@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import type { OutputData } from "@editorjs/editorjs";
 import { EditorOrchestrator } from "@/lib/orchestrator";
-import "@/styles/editor.css"
 export default function EditorCanvas({
   holderId,
   documentId,
