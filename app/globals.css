@@ -55,9 +55,16 @@
     padding-bottom: 120px !important;
   }
 
+    /* Shifts the entire block control actions closer to your content */
+  .ce-toolbar__actions {
+    right: 100% !important;
+    transform: translateX(-16px) !important; /* Adjust spacing from text block */
+  }
+  
   .ce-block__content,
   .ce-toolbar__content {
     max-width: 100% !important;
+    position: relative;
   }
 
   .ce-paragraph {
