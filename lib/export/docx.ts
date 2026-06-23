@@ -134,7 +134,7 @@ async function nodeToDocxElements(
             new ImageRun({
               data: bytes,
               transformation: { width: 400, height: 300 },
-              type: docxType,
+              type: docxType as any,
               altText: {
                 title: node.caption || asset.name,
                 description: node.caption || asset.name,
