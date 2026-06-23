@@ -54,11 +54,15 @@ export function buildEditorTools(documentId: string) {
       tunes: ["alignment"],
     },
     header: {
-      class: Header,
-       inlineToolbar: true,
-      config:  levels:[1,2,3,4,5], defaultLevel: 2, placeholder: "Heading" },
-      tunes: ["alignment"],
-    },
+  class: Header,
+  inlineToolbar: true,
+  config: { 
+    levels:, 
+    defaultLevel: 2, 
+    placeholder: "Heading" 
+  },
+  tunes: ["alignment"],
+},
     list: {
       class: asBlockTool(EditorjsList),
       inlineToolbar: true,
