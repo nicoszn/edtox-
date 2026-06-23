@@ -55,16 +55,10 @@
     padding-bottom: 120px !important;
   }
 
-    /* Shifts the entire block control actions closer to your content */
-  .ce-toolbar__actions {
-    right: 100% !important;
-    transform: translateX(-16px) !important; /* Adjust spacing from text block */
-  }
   
   .ce-block__content,
   .ce-toolbar__content {
     max-width: 100% !important;
-    position: relative;
   }
 
   .ce-paragraph {
@@ -89,7 +83,14 @@
     color: var(--color-ink);
   }
 
-  .ce-inline-toolbar,
+    /* Style the Floating Inline Tooltip Menu */
+  .ce-inline-toolbar {
+    background-color: var(--color-paper) !important;
+    border: 1px solid var(--color-rule) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 20px rgba(26, 26, 24, 0.12) !important;
+    padding: 2px !important;
+  }
   .ce-conversion-toolbar,
   .ce-settings,
   .ce-toolbox {
@@ -98,7 +99,23 @@
     box-shadow: 0 4px 16px rgba(26, 26, 24, 0.08);
   }
 
-  .ce-inline-tool--active,
+  /* Style individual formatting buttons inside the tooltip */
+  .ce-inline-tool {
+    color: var(--color-ink-soft) !important;
+    border-radius: 4px !important;
+    transition: all 0.15s ease;
+  }
+
+  .ce-inline-tool:hover {
+    background-color: var(--color-rule) !important;
+    color: var(--color-ink) !important;
+  }
+
+   /* Style the Active Tool state color */
+  .ce-inline-tool--active {
+    color: var(--color-umber) !important;
+    background-color: rgba(139, 90, 60, 0.08) !important;
+  }
   .ce-popover-item--active {
     color: var(--color-umber);
   }
