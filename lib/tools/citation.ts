@@ -1,15 +1,9 @@
 import type { BlockTool, BlockToolConstructorOptions, API } from "@editorjs/editorjs";
 import type { CitationData } from "@/types/citation";
 
-/**
- * Custom block tool: a structured citation entry (author, year, source).
- * Editor.js has no stock equivalent — this is the school-writing-specific
- * primitive the rest of the toolset doesn't cover.
- */
 export default class Citation implements BlockTool {
   private data: CitationData;
   private api: API;
-  private wrapper: HTMLElement | null = null;
 
   static get toolbox() {
     return {
@@ -35,14 +29,12 @@ export default class Citation implements BlockTool {
     const row = document.createElement("div");
     row.classList.add("citation-row");
 
-    const author = this.makeField("Author", this.data.author, "citation-author");
-    const year = this.makeField("Year", this.data.year, "citation-year");
-    row.append(author, year);
+    row.append(
+      this.makeField("Author", this.data.author, "citation-author"),
+      this.makeField("Year", this.data.year, "citation-year")
+    );
 
-    const source = this.makeField("Source / publication", this.data.source, "citation-source");
-
-    wrapper.append(row, source);
-    this.wrapper = wrapper;
+    wrapper.append(row, this.makeField("Source / publication", this.data.source, "citation-source"));
     return wrapper;
   }
 

@@ -1,5 +1,6 @@
 import type { BlockToolConstructable, InlineToolConstructable, BlockTuneConstructable } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
+import Paragraph from "@editorjs/paragraph";
 import EditorjsList from "@editorjs/list";
 import Quote from "@editorjs/quote";
 import Code from "@editorjs/code";
@@ -10,17 +11,23 @@ import Marker from "@editorjs/marker";
 import Underline from "@editorjs/underline";
 import ImageTool from "@editorjs/image";
 import AttachesTool from "@editorjs/attaches";
-import LinkTool from "@editorjs/link";
 import FootnotesTune from "@editorjs/footnotes";
 // @ts-expect-error -- package ships no types; CommonJS default export
 import TOC from "@phigoro/editorjs-toc";
 // @ts-expect-error -- package ships no types
 import AlignmentTune from "editorjs-text-alignment-blocktune";
 import { InlineMathTool, MathBlockTool } from "editorjs-mathcyou";
-
+import katex from "katex";
+import "katex/dist/katex.min.css";
 import Citation from "@/lib/tools/citation";
 import PageBreak from "@/lib/tools/pagebreak";
+import SimpleLink from "@/lib/tools/simplelink";
 import { createIndexedDbUploader, createAttachesUploader } from "@/lib/storage/uploader";
+
+if (typeof window !== "undefined") {
+  // editorjs-mathcyou expects KaTeX on window for static/bundled builds.
+  (window as unknown as { katex: typeof katex }).katex = katex;
+}
 
 /**
  * Several third-party Editor.js tool packages ship type declarations that
@@ -43,6 +50,11 @@ const asTune = (tool: unknown) => tool as BlockTuneConstructable;
  */
 export function buildEditorTools(documentId: string) {
   return {
+    paragraph: {
+      class: asBlockTool(Paragraph),
+      inlineToolbar: true,
+      tunes: ["alignment"],
+    },
     header: {
       class: asBlockTool(Header),
       config: { levels: [1, 2, 3], defaultLevel: 2, placeholder: "Heading" },
@@ -52,6 +64,7 @@ export function buildEditorTools(documentId: string) {
       class: asBlockTool(EditorjsList),
       inlineToolbar: true,
       config: { defaultStyle: "unordered" },
+      tunes: ["alignment"],
     },
     quote: {
       class: asBlockTool(Quote),
@@ -64,6 +77,7 @@ export function buildEditorTools(documentId: string) {
       class: asBlockTool(Table),
       inlineToolbar: true,
       config: { rows: 2, cols: 2 },
+      tunes: ["alignment"],
     },
     delimiter: asBlockTool(Delimiter),
     inlineCode: asInlineTool(InlineCode),
@@ -74,7 +88,6 @@ export function buildEditorTools(documentId: string) {
       class: asBlockTool(ImageTool),
       config: {
         uploader: createIndexedDbUploader(documentId),
-        field: "image",
       },
       tunes: ["alignment"],
     },
@@ -84,15 +97,7 @@ export function buildEditorTools(documentId: string) {
         uploader: createAttachesUploader(documentId),
       },
     },
-    linkTool: {
-      class: asBlockTool(LinkTool),
-      config: {
-        // No metadata-fetch backend (no server); the tool still accepts a
-        // raw URL and renders it, just without the auto-fetched title/image
-        // preview that a fetchUrl endpoint would normally provide.
-        endpoint: "",
-      },
-    },
+    linkTool: { class: asBlockTool(SimpleLink) },
 
     inlineMath: { class: asInlineTool(InlineMathTool) },
     mathBlock: { class: asBlockTool(MathBlockTool) },
