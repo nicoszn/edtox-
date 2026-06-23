@@ -106,3 +106,20 @@ declare module '*.pcss' {
   export default content;
 }
 
+declare module '@codexteam/shortcuts' {
+  interface ShortcutOptions {
+    name: string;
+    on?: (event: KeyboardEvent) => void;
+  }
+
+  class Shortcut {
+    constructor(options: ShortcutOptions);
+    public remove(): void;
+  }
+
+  export default Shortcut;
+}
+
+
+
+
