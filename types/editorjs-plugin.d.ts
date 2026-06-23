@@ -7,7 +7,7 @@ declare module '@editorjs/header' {
 declare module '@editorjs/list' {
   import { BlockToolConstructable } from '@editorjs/editorjs';
   const List: BlockToolConstructable;
-  export default List;
+  export default EditorjsList;
 }
 
 declare module '@editorjs/quote' {
@@ -68,19 +68,19 @@ declare module '@editorjs/underline' {
 declare module '@editorjs/image' {
   import { BlockToolConstructable } from '@editorjs/editorjs';
   const ImageTool: BlockToolConstructable;
-  export default Image;
+  export default ImageTool;
 }
 
 declare module '@editorjs/attaches' {
   import { BlockToolConstructable } from '@editorjs/editorjs';
   const AttachesTool: BlockToolConstructable;
-  export default Attaches;
+  export default AttachesTool;
 }
 
 declare module '@editorjs/footnotes' {
   import { BlockTuneConstructable } from '@editorjs/editorjs';
   const FootnotesTune: BlockTuneConstructable;
-  export default Footnotes;
+  export default FootnotesTune;
 }
 
 declare module '@phigoro/editorjs-toc' {
@@ -92,7 +92,7 @@ declare module '@phigoro/editorjs-toc' {
 declare module 'editorjs-text-alignment-blocktune' {
   import { BlockTuneConstructable } from '@editorjs/editorjs';
   const AlignmentTune: BlockTuneConstructable;
-  export default Alignment;
+  export default AlignmentTune;
 }
 
 declare module 'editorjs-mathcyou' {
