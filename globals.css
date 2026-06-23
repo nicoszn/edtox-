@@ -1,0 +1,327 @@
+@import "tailwindcss";
+
+:root {
+  --color-paper: #fafaf8;
+  --color-ink: #1a1a18;
+  --color-ink-soft: #5a5650;
+  --color-umber: #8b5a3c;
+  --color-umber-soft: #c99a78;
+  --color-rule: #e8e4dc;
+  --color-moss: #3d5a4c;
+  --color-danger: #a3402f;
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-umber);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------- Editor.js surface ---------- */
+
+.codex-editor {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+}
+
+.codex-editor__redactor {
+  padding-bottom: 120px !important;
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+  max-width: 100% !important;
+}
+
+.ce-paragraph {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+.ce-header {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+  color: var(--color-ink-soft);
+}
+
+.ce-toolbar__plus:hover,
+.ce-toolbar__settings-btn:hover {
+  background: var(--color-rule);
+  color: var(--color-ink);
+}
+
+.ce-inline-toolbar,
+.ce-conversion-toolbar,
+.ce-settings,
+.ce-toolbox {
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  box-shadow: 0 4px 16px rgba(26, 26, 24, 0.08);
+}
+
+.ce-inline-tool--active,
+.ce-popover-item--active {
+  color: var(--color-umber);
+}
+
+.cdx-marker {
+  background: rgba(139, 90, 60, 0.18);
+}
+
+.cdx-quote {
+  border-left: 3px solid var(--color-umber);
+  padding-left: 1rem;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+.ce-code__textarea,
+code {
+  font-family: var(--font-mono) !important;
+  font-size: 0.9rem;
+}
+
+/* ---------- Citation custom block ---------- */
+
+.citation-block {
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-moss);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  background: rgba(61, 90, 76, 0.04);
+}
+
+.citation-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.citation-field {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  outline: none;
+  min-width: 2rem;
+}
+
+.citation-field:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-ink-soft);
+  opacity: 0.6;
+}
+
+.citation-author {
+  font-weight: 600;
+  flex: 1;
+}
+
+.citation-year {
+  color: var(--color-ink-soft);
+  width: 4rem;
+}
+
+.citation-source {
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- Simple link custom block (no-fetch) ---------- */
+
+.simple-link-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-umber);
+  border-radius: 4px;
+  padding: 0.6rem 0.9rem;
+  background: rgba(139, 90, 60, 0.03);
+}
+
+.simple-link-field {
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.simple-link-url {
+  font-family: var(--font-mono);
+  color: var(--color-umber);
+}
+
+.simple-link-label {
+  color: var(--color-ink-soft);
+}
+
+.simple-link-field:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-ink-soft);
+  opacity: 0.5;
+}
+
+
+
+.codex-editor__redactor {
+  counter-reset: scribe-page 1;
+}
+
+.pagebreak-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  user-select: none;
+  counter-increment: scribe-page;
+}
+
+.pagebreak-line {
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed var(--color-umber-soft);
+}
+
+.pagebreak-label {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-umber);
+  opacity: 0.7;
+}
+
+.pagebreak-label::after {
+  content: " — ends page " counter(scribe-page);
+}
+
+/* ---------- Math (editorjs-mathcyou) ---------- */
+
+.math-block-wrapper {
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(139, 90, 60, 0.05);
+  border-radius: 6px;
+  border: 1px solid var(--color-rule);
+}
+
+.math-block-preview {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+}
+
+.math-block-input {
+  width: 100%;
+  padding: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  background: var(--color-paper);
+}
+
+.inline-math {
+  display: inline-block;
+  padding: 0 0.2rem;
+  background: rgba(139, 90, 60, 0.1);
+  border-radius: 3px;
+}
+
+/* ---------- Footnotes tune ---------- */
+
+.cdx-footnotes-tune-popover,
+.ej-footnotes {
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- TOC block ---------- */
+
+.toc-tool {
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.toc-tool__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+/* ---------- Image / Attaches ---------- */
+
+.image-tool__image-picture {
+  border-radius: 6px;
+}
+
+.cdx-attaches {
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+}
+
+/* ---------- Print (PDF export path) ---------- */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm 16mm 22mm 16mm;
+    @bottom-center {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: var(--font-mono), monospace;
+      font-size: 9pt;
+      color: #5a5650;
+    }
+  }
+
+  body {
+    background: white;
+  }
+
+  .pagebreak-block {
+    break-after: page;
+  }
+
+  .pagebreak-line,
+  .pagebreak-label {
+    display: none;
+  }
+
+  .ce-toolbar,
+  .ce-block--selected,
+  .codex-editor--narrow .ce-toolbar {
+    display: none !important;
+  }
+}
