@@ -11,6 +11,7 @@ import {
   PageBreak,
   AlignmentType,
   WidthType,
+  ExternalHyperlink,
 } from "docx";
 import type { OutputData } from "@editorjs/editorjs";
 import { toExportNodes, type ExportListItem, type ExportNode } from "@/lib/export/model";
@@ -19,6 +20,26 @@ import { getAsset } from "@/lib/storage/assets";
 async function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   const buffer = await blob.arrayBuffer();
   return new Uint8Array(buffer);
+}
+
+type DocxImageType = "png" | "jpg" | "gif" | "bmp" | "svg";
+
+function mimeToDocxImageType(mime: string): DocxImageType | null {
+  switch (mime) {
+    case "image/png":
+      return "png";
+    case "image/jpeg":
+    case "image/jpg":
+      return "jpg";
+    case "image/gif":
+      return "gif";
+    case "image/bmp":
+      return "bmp";
+    case "image/svg+xml":
+      return "svg";
+    default:
+      return null;
+  }
 }
 
 function flattenListItems(items: ExportListItem[], ordered: boolean, depth = 0): Paragraph[] {
@@ -103,13 +124,22 @@ async function nodeToDocxElements(
       const asset = await getAsset(node.assetId);
       if (!asset) return [new Paragraph({ text: node.caption || "[Image unavailable]" })];
       const bytes = await blobToUint8Array(asset.blob);
+      const docxType = mimeToDocxImageType(asset.mimeType);
+      if (!docxType) {
+        return [new Paragraph({ text: node.caption || `[Unsupported image: ${asset.mimeType}]` })];
+      }
       const elements: Paragraph[] = [
         new Paragraph({
           children: [
             new ImageRun({
               data: bytes,
               transformation: { width: 400, height: 300 },
-              type: "png",
+              type: docxType,
+              altText: {
+                title: node.caption || asset.name,
+                description: node.caption || asset.name,
+                name: asset.name,
+              },
             }),
           ],
         }),
@@ -121,6 +151,19 @@ async function nodeToDocxElements(
     }
     case "attachment":
       return [new Paragraph({ text: `📎 ${node.name}` })];
+    case "link":
+      return [
+        new Paragraph({
+          children: [
+            new ExternalHyperlink({
+              link: node.url,
+              children: [
+                new TextRun({ text: node.label || node.url, style: "Hyperlink" }),
+              ],
+            }),
+          ],
+        }),
+      ];
     default:
       return [];
   }

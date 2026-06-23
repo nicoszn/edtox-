@@ -37,6 +37,8 @@ function nodeToText(node: ExportNode): string {
       return node.caption ? `[Image: ${node.caption}]` : "[Image]";
     case "attachment":
       return `[Attachment: ${node.name}]`;
+    case "link":
+      return node.label ? `${node.label} (${node.url})` : node.url;
     default:
       return "";
   }

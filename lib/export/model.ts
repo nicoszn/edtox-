@@ -13,7 +13,8 @@ export type ExportNode =
   | { kind: "math"; latex: string }
   | { kind: "toc"; items: { text: string; level: number }[] }
   | { kind: "image"; assetId?: string; url?: string; caption: string }
-  | { kind: "attachment"; assetId?: string; name: string };
+  | { kind: "attachment"; assetId?: string; name: string }
+  | { kind: "link"; url: string; label: string };
 
 export interface ExportListItem {
   text: string;
@@ -96,6 +97,8 @@ export function toExportNode(block: OutputBlockData): ExportNode | null {
       const file = d.file as { assetId?: string; name?: string } | undefined;
       return { kind: "attachment", assetId: file?.assetId, name: file?.name ?? "attachment" };
     }
+    case "linkTool":
+      return { kind: "link", url: String(d.url ?? ""), label: String(d.label ?? "") };
     default:
       return null;
   }

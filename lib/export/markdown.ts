@@ -45,6 +45,8 @@ function nodeToMarkdown(node: ExportNode): string {
       return node.caption ? `![${node.caption}](${node.url ?? ""})` : `![](${node.url ?? ""})`;
     case "attachment":
       return `[📎 ${node.name}](${node.assetId ?? ""})`;
+    case "link":
+      return node.label ? `[${node.label}](${node.url})` : node.url;
     default:
       return "";
   }
