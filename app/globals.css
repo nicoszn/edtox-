@@ -360,6 +360,57 @@
     font-size: 1.125rem; /* ~18px */
   }
 
+    /* ---------- Mermaid Layout Block Styles ---------- */
+  .mermaid-block-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    margin: 1rem 0;
+  }
+
+  /* Split row design format on desktop reading views */
+  @media (min-width: 768px) {
+    .mermaid-block-wrapper {
+      flex-direction: row;
+      align-items: stretch;
+    }
+  }
+
+  .mermaid-block-input {
+    flex: 1;
+    min-height: 150px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid var(--color-rule);
+    border-radius: 4px;
+    outline: none;
+    resize: vertical;
+    color: var(--color-ink);
+  }
+
+  .mermaid-block-preview {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid var(--color-rule);
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .mermaid-block-preview svg {
+    max-width: 100%;
+    height: auto;
+  }
+
   /* ---------- Print (PDF export path) ---------- */
   @media print {
       @page {
@@ -403,6 +454,23 @@
     .ce-block--selected,
     .codex-editor--narrow .ce-toolbar {
       display: none !important;
+    }
+
+      /* Hide the code entry input fields when saving to a static document */
+    .mermaid-block-input {
+      display: none !important;
+    }
+    
+    .mermaid-block-wrapper {
+      border: none !important;
+      background: transparent !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    .mermaid-block-preview {
+      border: none !important;
+      width: 100% !important;
     }
   }
 }
