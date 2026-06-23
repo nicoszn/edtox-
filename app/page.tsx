@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import type { DocumentMeta } from "@/types/document";
 import { listDocuments } from "@/lib/storage";
-import DocumentCard from "@/components/home/DocumentCard";
-import NewDocumentButton from "@/components/home/NewDocumentButton";
+import DocumentCard from "@/components/DocumentCard";
+import NewDocumentButton from "@/components/NewDocumentButton";
 
 export default function HomePage() {
   const [docs, setDocs] = useState<DocumentMeta[] | null>(null);
