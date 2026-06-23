@@ -155,3 +155,153 @@ code {
   font-style: italic;
   color: var(--color-ink-soft);
 }
+
+/* ---------- Simple link custom block (no-fetch) ---------- */
+
+.simple-link-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-umber);
+  border-radius: 4px;
+  padding: 0.6rem 0.9rem;
+  background: rgba(139, 90, 60, 0.03);
+}
+
+.simple-link-field {
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.simple-link-url {
+  font-family: var(--font-mono);
+  color: var(--color-umber);
+}
+
+.simple-link-label {
+  color: var(--color-ink-soft);
+}
+
+.simple-link-field:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-ink-soft);
+  opacity: 0.5;
+}
+
+
+
+.pagebreak-block {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  user-select: none;
+}
+
+.pagebreak-line {
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed var(--color-umber-soft);
+}
+
+.pagebreak-label {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-umber);
+  opacity: 0.7;
+}
+
+/* ---------- Math (editorjs-mathcyou) ---------- */
+
+.math-block-wrapper {
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(139, 90, 60, 0.05);
+  border-radius: 6px;
+  border: 1px solid var(--color-rule);
+}
+
+.math-block-preview {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+}
+
+.math-block-input {
+  width: 100%;
+  padding: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  background: var(--color-paper);
+}
+
+.inline-math {
+  display: inline-block;
+  padding: 0 0.2rem;
+  background: rgba(139, 90, 60, 0.1);
+  border-radius: 3px;
+}
+
+/* ---------- Footnotes tune ---------- */
+
+.cdx-footnotes-tune-popover,
+.ej-footnotes {
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- TOC block ---------- */
+
+.toc-tool {
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.toc-tool__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+/* ---------- Image / Attaches ---------- */
+
+.image-tool__image-picture {
+  border-radius: 6px;
+}
+
+.cdx-attaches {
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+}
+
+/* ---------- Print (PDF export path) ---------- */
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .pagebreak-block {
+    break-after: page;
+  }
+
+  .pagebreak-line,
+  .pagebreak-label {
+    display: none;
+  }
+
+  .ce-toolbar,
+  .ce-block--selected,
+  .codex-editor--narrow .ce-toolbar {
+    display: none !important;
+  }
+}

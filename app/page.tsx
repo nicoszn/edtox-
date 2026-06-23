@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import type { DocumentMeta } from "@/types/document";
-import { listDocuments } from "@/lib/storage";
-import DocumentCard from "@/components/DocumentCard";
-import NewDocumentButton from "@/components/NewDocumentButton";
+import { listDocuments } from "@/lib/storage/documents";
+import DocumentCard from "@/components/home/DocumentCard";
+import NewDocumentButton from "@/components/home/NewDocumentButton";
 
 export default function HomePage() {
   const [docs, setDocs] = useState<DocumentMeta[] | null>(null);
 
   useEffect(() => {
-    setDocs(listDocuments());
+    listDocuments().then(setDocs);
   }, []);
 
   function handleDeleted(id: string) {
