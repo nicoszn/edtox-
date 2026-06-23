@@ -353,12 +353,35 @@
 
   /* ---------- Print (PDF export path) ---------- */
   @media print {
+      @page {
+    size: A4;
+    margin: 20mm 16mm 22mm 16mm;
+    @bottom-center {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: var(--font-mono), monospace;
+      font-size: 9pt;
+      color: #5a5650;
+    }
     body {
-      background: white;
+      background: white !important;
+      color: #000000 !important;
     }
 
     .pagebreak-block {
       break-after: page;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    /* Prevent tables, quotes, or images from getting chopped in half across lines */
+    .math-block-wrapper,
+    .citation-block,
+    .simple-link-block,
+    .image-tool__image-picture,
+    table,
+    blockquote {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
 
     .pagebreak-line,
