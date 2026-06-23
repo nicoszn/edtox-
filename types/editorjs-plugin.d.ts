@@ -109,7 +109,8 @@ declare module '*.pcss' {
 declare module '@codexteam/shortcuts' {
   interface ShortcutOptions {
     name: string;
-    on?: (event: KeyboardEvent) => void;
+    on: HTMLElement;
+    callback: (event?: KeyboardEvent) => void;
   }
 
   class Shortcut {
@@ -119,6 +120,7 @@ declare module '@codexteam/shortcuts' {
 
   export default Shortcut;
 }
+
 
 
 
