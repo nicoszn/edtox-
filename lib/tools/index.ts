@@ -49,13 +49,14 @@ const asTune = (tool: unknown) => tool as BlockTuneConstructable;
 export function buildEditorTools(documentId: string) {
   return {
     paragraph: {
-      class: asBlockTool(Paragraph),
+      class: Paragraph,
       inlineToolbar: true,
       tunes: ["alignment"],
     },
     header: {
-      class: asBlockTool(Header),
-      config: { levels: [1, 2, 3], defaultLevel: 2, placeholder: "Heading" },
+      class: Header,
+       inlineToolbar: true,
+      config:  levels:[1,2,3,4,5], defaultLevel: 2, placeholder: "Heading" },
       tunes: ["alignment"],
     },
     list: {
