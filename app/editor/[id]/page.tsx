@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { OutputData } from "@editorjs/editorjs";
-import { getDocument, saveDocument } from "@/lib/storage";
+import { getDocument, saveDocument } from "@/lib/storage/documents";
 import { countWords } from "@/lib/wordcount";
+import { countPages } from "@/lib/pages";
 import { EMPTY_CONTENT } from "@/types/document";
 import TitleBar from "@/components/editor/TitleBar";
 import EditorCanvas from "@/components/editor/EditorCanvas";
@@ -19,6 +20,7 @@ export default function EditorPage() {
 
   const [title, setTitle] = useState("");
   const [wordCount, setWordCount] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [initialData, setInitialData] = useState<OutputData | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -28,30 +30,39 @@ export default function EditorPage() {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const doc = getDocument(id);
-    if (!doc) {
-      setNotFound(true);
-      return;
-    }
-    setTitle(doc.title);
-    latestTitleRef.current = doc.title;
-    latestContentRef.current = doc.content;
-    setWordCount(doc.wordCount);
-    setInitialData(doc.content);
+    let cancelled = false;
+    getDocument(id).then((doc) => {
+      if (cancelled) return;
+      if (!doc) {
+        setNotFound(true);
+        return;
+      }
+      setTitle(doc.title);
+      latestTitleRef.current = doc.title;
+      latestContentRef.current = doc.content;
+      setWordCount(doc.wordCount);
+      setPageCount(doc.pageCount);
+      setInitialData(doc.content);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   function scheduleSave() {
     setSaveState("saving");
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      saveDocument(id, latestTitleRef.current, latestContentRef.current);
-      setSaveState("saved");
+      saveDocument(id, latestTitleRef.current, latestContentRef.current).then(() => {
+        setSaveState("saved");
+      });
     }, SAVE_DEBOUNCE_MS);
   }
 
   function handleContentChange(data: OutputData) {
     latestContentRef.current = data;
     setWordCount(countWords(data));
+    setPageCount(countPages(data));
     scheduleSave();
   }
 
@@ -61,7 +72,6 @@ export default function EditorPage() {
     scheduleSave();
   }
 
-  // Flush a pending save on unmount so navigating away doesn't drop edits.
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) {
@@ -108,15 +118,17 @@ export default function EditorPage() {
       <TitleBar
         title={title}
         wordCount={wordCount}
+        pageCount={pageCount}
         saveState={saveState}
         onTitleChange={handleTitleChange}
       />
       <EditorCanvas
         holderId={`editorjs-${id}`}
+        documentId={id}
         initialData={initialData}
         onChange={handleContentChange}
       />
-      <Toolbar title={title} getContent={getContent} />
+      <Toolbar documentId={id} title={title} getContent={getContent} />
     </main>
   );
 }
