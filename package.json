@@ -34,7 +34,7 @@
     "docx": "^9.7.1",
     "jszip": "^3.10.1",
     "file-saver": "^2.0.5",
-    "mermaid": "11.15.0",
+    "mermaid": "11.15.0"
   },
   "devDependencies": {
     "typescript": "6.0.3",
