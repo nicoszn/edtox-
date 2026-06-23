@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { DocumentMeta } from "@/types/document";
-import { deleteDocument } from "@/lib/storage";
+import { deleteDocument } from "@/lib/storage/documents";
 
 function formatDate(ts: number): string {
   const d = new Date(ts);
@@ -23,10 +23,10 @@ export default function DocumentCard({
 }) {
   const router = useRouter();
 
-  function handleDelete(e: React.MouseEvent) {
+  async function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
     if (!window.confirm(`Delete "${doc.title}"? This can't be undone.`)) return;
-    deleteDocument(doc.id);
+    await deleteDocument(doc.id);
     onDeleted(doc.id);
   }
 
@@ -40,7 +40,8 @@ export default function DocumentCard({
           {doc.title || "Untitled document"}
         </h3>
         <p className="mt-1 text-xs font-[family-name:var(--font-mono)] text-[var(--color-ink-soft)]">
-          {formatDate(doc.updatedAt)} · {doc.wordCount} {doc.wordCount === 1 ? "word" : "words"}
+          {formatDate(doc.updatedAt)} · {doc.wordCount} {doc.wordCount === 1 ? "word" : "words"} ·{" "}
+          {doc.pageCount} {doc.pageCount === 1 ? "page" : "pages"}
         </p>
       </div>
       <span
