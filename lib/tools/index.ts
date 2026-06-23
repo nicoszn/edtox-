@@ -58,7 +58,7 @@ export function buildEditorTools(documentId: string) {
     class: Header,
     inlineToolbar: true,
     config: { 
-      levels:, 
+      levels: [1, 2, 3, 4, 5], 
       defaultLevel: 2, 
       placeholder: "Heading" 
     },
