@@ -100,3 +100,9 @@ declare module 'editorjs-mathcyou' {
   export const InlineMathTool: InlineToolConstructable;
   export const MathBlock: BlockToolConstructable;
 }
+
+declare module '*.pcss' {
+  const content: { [className: string]: string };
+  export default content;
+}
+
