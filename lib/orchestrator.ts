@@ -1,19 +1,15 @@
 import EditorJS, { type OutputData } from "@editorjs/editorjs";
-import { EDITOR_TOOLS } from "@/lib/tools";
+import { buildEditorTools } from "@/lib/tools";
+import { rehydrateAssetUrls } from "@/lib/storage/rehydrate";
 
 interface OrchestratorOptions {
   holderId: string;
+  documentId: string;
   initialData: OutputData;
   onChange: (data: OutputData) => void;
   placeholder?: string;
 }
 
-/**
- * Owns exactly one Editor.js instance for the lifetime of the editor screen.
- * Mirrors the orchestrator pattern used elsewhere: a single class responsible
- * for init, teardown, and save, so the React component never touches the
- * Editor.js instance directly.
- */
 export class EditorOrchestrator {
   private editor: EditorJS | null = null;
   private destroyed = false;
@@ -22,10 +18,14 @@ export class EditorOrchestrator {
 
   async init(): Promise<void> {
     if (this.editor) return;
+
+    const hydrated = await rehydrateAssetUrls(this.options.initialData);
+    if (this.destroyed) return;
+
     this.editor = new EditorJS({
       holder: this.options.holderId,
-      tools: EDITOR_TOOLS,
-      data: this.options.initialData,
+      tools: buildEditorTools(this.options.documentId),
+      data: hydrated,
       placeholder: this.options.placeholder ?? "Start writing…",
       autofocus: false,
       onChange: async () => {
