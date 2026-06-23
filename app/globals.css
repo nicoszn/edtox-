@@ -49,10 +49,14 @@
   .codex-editor {
     font-family: var(--font-body);
     color: var(--color-ink);
+    position: relative !important;
+    overflow-anchor: none !important; 
   }
 
   .codex-editor__redactor {
     padding-bottom: 120px !important;
+    will-change: transform; /* Hint to browser to isolate paint cycles */
+    contain: layout style;
   }
 
   
@@ -70,6 +74,11 @@
     font-family: var(--font-display);
     font-weight: 600;
     color: var(--color-ink);
+  }
+
+  .ce-toolbar {
+    position: absolute !important;
+    transform: translate3d(0, 0, 0); /* Force GPU layer rendering for smooth anchor tracking */
   }
 
   .ce-toolbar__plus,
