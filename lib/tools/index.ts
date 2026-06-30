@@ -141,7 +141,7 @@ export function buildEditorTools(documentId: string) {
     class: MermaidBlock
   },
     math: {
-    class: mathBlock
+    class: MathBlock
   },
 
   // ---------- BLOCK TUNES ----------
