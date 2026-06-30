@@ -21,6 +21,7 @@ import Citation from "@/lib/tools/citation";
 import PageBreak from "@/lib/tools/pagebreak";
 import SimpleLink from "@/lib/tools/simplelink";
 import MermaidBlock from "@/lib/tools/mermaid";
+import MathBlock from "@/lib/tools/mathblock";
 
 import { createIndexedDbUploader, createAttachesUploader } from "@/lib/storage/uploader";
 
