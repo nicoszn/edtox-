@@ -139,6 +139,9 @@ export function buildEditorTools(documentId: string) {
     mermaid: {
     class: MermaidBlock
   },
+    math: {
+    class: mathBlock
+  },
 
   // ---------- BLOCK TUNES ----------
   footnotes: {
