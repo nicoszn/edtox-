@@ -335,10 +335,6 @@
   text-align: center;
 }
 
-.mermaid-error {
-  color: var(--color-danger);
-}
-
 
   /* ---------- Math (editorjs-mathcyou) ---------- */
   .math-block-wrapper {
@@ -551,6 +547,7 @@
     .mermaid-block-preview {
       border: none !important;
       width: 100% !important;
+      
     }
 
       .mermaid-toolbar,
