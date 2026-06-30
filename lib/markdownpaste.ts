@@ -1,6 +1,5 @@
 import type { OutputBlockData } from "@editorjs/editorjs";
 
-/** Converts **bold**, *italic*/_italic_, `code`, and [text](url) to the inline HTML Editor.js expects. */
 function inlineMdToHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
