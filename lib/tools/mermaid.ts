@@ -18,6 +18,7 @@ export default class MermaidBlock implements BlockTool {
   private api: API;
   private data: { code: string };
   private wrapper: HTMLDivElement | null = null;
+  private uniqueId: string;
 
   static get toolbox() {
     return {
@@ -31,6 +32,8 @@ export default class MermaidBlock implements BlockTool {
     this.data = {
       code: data.code || 'graph TD\n  A[Start] --> B(Process)\n  B --> C{Decision}\n  C -->|Yes| D[Success]\n  C -->|No| E[Error]'
     };
+    // Generate the ID once in the constructor to keep it persistent across cycles
+    this.uniqueId = `mermaid-${Math.random().toString(36).substring(2, 11)}`;
   }
 
   render(): HTMLDivElement {
@@ -44,36 +47,54 @@ export default class MermaidBlock implements BlockTool {
 
     const previewSide = document.createElement('div');
     previewSide.classList.add('mermaid-block-preview');
-    
-    // Fallback unique id string generation mapping
-    const uniqueId = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-    previewSide.id = uniqueId;
+    previewSide.id = this.uniqueId;
 
     // Execution parser runner
     const renderDiagram = async (codeStr: string) => {
-      if (!codeStr.trim()) return;
+      if (!codeStr.trim()) {
+        previewSide.innerHTML = '';
+        return;
+      }
+      
+      const svgId = `svg-${this.uniqueId}`;
+      
       try {
-        previewSide.removeAttribute('data-processed');
-        const { svg } = await mermaid.render(`${uniqueId}-svg`, codeStr);
+        // Compile the diagram string asynchronously
+        const { svg } = await mermaid.render(svgId, codeStr);
         previewSide.innerHTML = svg;
       } catch (err) {
-        // Clear broken syntax configurations from view softly
-        previewSide.innerHTML = `<span class="text-danger text-xs font-mono">Invalid Mermaid Syntax</span>`;
+        // Render user-friendly error state
+        previewSide.innerHTML = `<span class="text-danger text-xs font-mono" style="color: #dc3545; font-size: 12px; font-family: monospace;">Invalid Mermaid Syntax</span>`;
+        
+        // CRITICAL: Clean up broken SVG elements injected by Mermaid into document body root
+        const brokenElement = document.getElementById(svgId);
+        if (brokenElement) {
+          brokenElement.remove();
+        }
+        // Force reset body bindings or bindings appended by older mermaid compilation engines
+        const bindElement = document.getElementById(`d${svgId}`);
+        if (bindElement) {
+          bindElement.remove();
+        }
       }
     };
 
-    // Reactively re-render graphics on user typing events
+    // Update the internal state string values as the user edits the codebase
     editorSide.addEventListener('input', (e) => {
       const target = e.target as HTMLTextAreaElement;
       this.data.code = target.value;
-      renderDiagram(target.value);
+    });
+
+    // Auto-renders graphics when the user clicks out or finishes editing text nodes
+    editorSide.addEventListener('blur', () => {
+      renderDiagram(this.data.code);
     });
 
     container.appendChild(editorSide);
     container.appendChild(previewSide);
     this.wrapper = container;
 
-    // Initial canvas paint execution cycle
+    // Initial canvas paint execution cycle once DOM tree settles
     setTimeout(() => renderDiagram(this.data.code), 50);
 
     return container;
