@@ -8,6 +8,7 @@ export interface MermaidData {
 const DEFAULT_SOURCE =
   "graph TD\n  A[Start] --> B(Process)\n  B --> C{Decision}\n  C -->|Yes| D[Success]\n  C -->|No| E[Error]";
 
+// ✅ Client‑only initialization (safe for Next.js SSR)
 if (typeof window !== "undefined") {
   mermaid.initialize({
     startOnLoad: false,
@@ -23,8 +24,7 @@ if (typeof window !== "undefined") {
 export default class Mermaid implements BlockTool {
   private data: MermaidData;
   private mode: "edit" | "preview";
-  // Stable per-instance base ID — avoids the "already registered" error
-  // that occurs when mermaid.render() is called twice with the same SVG ID.
+  // Stable base ID for this block instance – we'll append a timestamp per render.
   private readonly baseId: string;
 
   static get toolbox() {
@@ -40,6 +40,7 @@ export default class Mermaid implements BlockTool {
 
   constructor({ data }: BlockToolConstructorOptions<Partial<MermaidData>>) {
     this.data = { source: data?.source ?? DEFAULT_SOURCE };
+    // Default to preview if source exists, otherwise edit for a blank start.
     this.mode = data?.source ? "preview" : "edit";
     this.baseId = `mermaid-${Math.random().toString(36).slice(2, 11)}`;
   }
@@ -48,6 +49,7 @@ export default class Mermaid implements BlockTool {
     const wrapper = document.createElement("div");
     wrapper.classList.add("mermaid-block");
 
+    // ---- Toolbar ----
     const toolbar = document.createElement("div");
     toolbar.classList.add("mermaid-toolbar");
 
@@ -57,6 +59,7 @@ export default class Mermaid implements BlockTool {
     toolbar.appendChild(toggleBtn);
     wrapper.appendChild(toolbar);
 
+    // ---- Source Editor ----
     const textarea = document.createElement("textarea");
     textarea.classList.add("mermaid-source");
     textarea.value = this.data.source;
@@ -64,32 +67,42 @@ export default class Mermaid implements BlockTool {
     textarea.placeholder = "graph TD\n  A[Start] --> B[End]";
     wrapper.appendChild(textarea);
 
+    // ---- Preview Container ----
     const preview = document.createElement("div");
     preview.classList.add("mermaid-preview");
     wrapper.appendChild(preview);
 
+    // ---- Core Render Function (fixed) ----
     const renderDiagram = async (src: string) => {
       if (!src.trim()) {
-        preview.innerHTML = '<p class="mermaid-empty">No diagram source yet.</p>';
+        preview.innerHTML =
+          '<p class="mermaid-empty">No diagram source yet.</p>';
         return;
       }
       try {
-        // Fresh ID per render call prevents mermaid's internal diagram
-        // registry from throwing "already registered" on re-renders.
+        // ✅ FIX 1: Unique ID per render call – avoids "already registered"
         const renderId = `${this.baseId}-${Date.now()}`;
+        // ✅ FIX 2: Remove the cached "processed" flag – forces re-render
         preview.removeAttribute("data-processed");
         const { svg } = await mermaid.render(renderId, src);
         preview.innerHTML = svg;
-      } catch {
-        preview.innerHTML = '<p class="mermaid-error">Invalid diagram syntax.</p>';
+      } catch (err) {
+        console.warn("Mermaid render error:", err);
+        preview.innerHTML =
+          '<p class="mermaid-error">Invalid diagram syntax.</p>';
       }
     };
 
+    // ---- Live update while typing (only in preview mode) ----
     textarea.addEventListener("input", () => {
       this.data.source = textarea.value;
-      if (this.mode === "preview") renderDiagram(textarea.value);
+      // If we are in preview mode, re‑render on every keystroke.
+      if (this.mode === "preview") {
+        renderDiagram(textarea.value);
+      }
     });
 
+    // ---- Mode toggle logic ----
     const applyMode = () => {
       const isEdit = this.mode === "edit";
       textarea.style.display = isEdit ? "block" : "none";
@@ -100,11 +113,17 @@ export default class Mermaid implements BlockTool {
     toggleBtn.addEventListener("click", () => {
       this.mode = this.mode === "edit" ? "preview" : "edit";
       applyMode();
-      if (this.mode === "preview") renderDiagram(this.data.source);
+      // When switching to preview, render the current source.
+      if (this.mode === "preview") {
+        renderDiagram(this.data.source);
+      }
     });
 
+    // ---- Initial setup ----
     applyMode();
+    // If we start in preview mode (existing diagram), render after mount.
     if (this.mode === "preview") {
+      // Small delay ensures the DOM is ready.
       setTimeout(() => renderDiagram(this.data.source), 50);
     }
 
@@ -115,6 +134,7 @@ export default class Mermaid implements BlockTool {
     return this.data;
   }
 
+  // Disable sanitization – we want the raw source string.
   static get sanitize() {
     return { source: false };
   }
