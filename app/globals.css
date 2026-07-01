@@ -36,30 +36,26 @@
 
   @media (prefers-reduced-motion: reduce) {
     *,
-    &::before,
-    &::after {
+    *::before,
+    *::after {
       animation-duration: 0.001ms !important;
       transition-duration: 0.001ms !important;
     }
   }
 }
-  
-/* ---------- Editor.js surface ---------- */
+
 @layer utilities {
+  /* ---------- Editor.js surface ---------- */
+
   .codex-editor {
     font-family: var(--font-body);
     color: var(--color-ink);
-    position: relative !important;
-    overflow-anchor: none !important; 
   }
 
   .codex-editor__redactor {
     padding-bottom: 120px !important;
-    will-change: transform; /* Hint to browser to isolate paint cycles */
-    contain: layout style;
   }
 
-  
   .ce-block__content,
   .ce-toolbar__content {
     max-width: 100% !important;
@@ -76,11 +72,6 @@
     color: var(--color-ink);
   }
 
-  .ce-toolbar {
-    position: absolute !important;
-    transform: translate3d(0, 0, 0); /* Force GPU layer rendering for smooth anchor tracking */
-  }
-
   .ce-toolbar__plus,
   .ce-toolbar__settings-btn {
     color: var(--color-ink-soft);
@@ -92,14 +83,7 @@
     color: var(--color-ink);
   }
 
-    /* Style the Floating Inline Tooltip Menu */
-  .ce-inline-toolbar {
-    background-color: var(--color-paper) !important;
-    border: 1px solid var(--color-rule) !important;
-    border-radius: 6px !important;
-    box-shadow: 0 4px 20px rgba(26, 26, 24, 0.12) !important;
-    padding: 2px !important;
-  }
+  .ce-inline-toolbar,
   .ce-conversion-toolbar,
   .ce-settings,
   .ce-toolbox {
@@ -108,42 +92,7 @@
     box-shadow: 0 4px 16px rgba(26, 26, 24, 0.08);
   }
 
-  /* Style individual formatting buttons inside the tooltip */
-  .ce-inline-tool {
-    color: var(--color-ink-soft) !important;
-    border-radius: 4px !important;
-    transition: all 0.15s ease;
-  }
-
-  .ce-inline-tool:hover {
-    background-color: var(--color-rule) !important;
-    color: var(--color-ink) !important;
-  }
-
-   /* Style the Active Tool state color */
-  .ce-inline-tool--active {
-    color: var(--color-umber) !important;
-    background-color: rgba(139, 90, 60, 0.08) !important;
-  }
-
-    /* Push the last items up by adding internal base padding */
-  .ce-popover__items {
-    padding-bottom: 12px !important; 
-    max-height: 320px !important; /* Prevents the menu from rendering too low on the screen */
-    overflow-y: auto !important;   /* Safely scrolls items if they exceed the max height */
-  }
-
-  /* Optional: Make the scrollbar look clean and minimalist */
-  .ce-popover__items::-webkit-scrollbar {
-    width: 5px;
-  }
-  
-  .ce-popover__items::-webkit-scrollbar-thumb {
-    background: var(--color-rule);
-    border-radius: 4px;
-  }
-
-  
+  .ce-inline-tool--active,
   .ce-popover-item--active {
     color: var(--color-umber);
   }
@@ -166,6 +115,7 @@
   }
 
   /* ---------- Citation custom block ---------- */
+
   .citation-block {
     border: 1px solid var(--color-rule);
     border-left: 3px solid var(--color-moss);
@@ -210,6 +160,7 @@
   }
 
   /* ---------- Simple link custom block (no-fetch) ---------- */
+
   .simple-link-block {
     display: flex;
     flex-direction: column;
@@ -242,12 +193,18 @@
   }
 
   /* ---------- Pagebreak block ---------- */
+
+  .codex-editor__redactor {
+    counter-reset: scribe-page 1;
+  }
+
   .pagebreak-block {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 0;
     user-select: none;
+    counter-increment: scribe-page;
   }
 
   .pagebreak-line {
@@ -266,77 +223,85 @@
     opacity: 0.7;
   }
 
+  .pagebreak-label::after {
+    content: " — ends page " counter(scribe-page);
+  }
+
   /* ---------- Mermaid diagram block ---------- */
 
-.mermaid-block {
-  border: 1px solid var(--color-rule);
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--color-paper);
-}
+  .mermaid-block {
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-paper);
+  }
 
-.mermaid-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.4rem 0.6rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid var(--color-rule);
-}
+  .mermaid-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.4rem 0.6rem;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--color-rule);
+  }
 
-.mermaid-toggle {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--color-umber);
-  background: none;
-  border: 1px solid var(--color-umber-soft);
-  border-radius: 4px;
-  padding: 0.25rem 0.6rem;
-  cursor: pointer;
-}
+  .mermaid-toggle {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--color-umber);
+    background: none;
+    border: 1px solid var(--color-umber-soft);
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+  }
 
-.mermaid-toggle:hover {
-  background: rgba(139, 90, 60, 0.08);
-}
+  .mermaid-toggle:hover {
+    background: rgba(139, 90, 60, 0.08);
+  }
 
-.mermaid-source {
-  display: none;
-  width: 100%;
-  min-height: 140px;
-  padding: 0.75rem;
-  border: none;
-  outline: none;
-  resize: vertical;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  background: var(--color-paper);
-  color: var(--color-ink);
-}
+  .mermaid-source {
+    display: none;
+    width: 100%;
+    min-height: 140px;
+    padding: 0.75rem;
+    border: none;
+    outline: none;
+    resize: vertical;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
 
-.mermaid-preview {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  overflow-x: auto;
-}
+  .mermaid-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    overflow-x: auto;
+  }
 
-.mermaid-preview svg {
-  max-width: 100%;
-  height: auto;
-}
+  .mermaid-preview svg {
+    max-width: 100%;
+    height: auto;
+  }
 
-.mermaid-empty,
-.mermaid-error {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--color-ink-soft);
-  text-align: center;
-}
+  .mermaid-empty,
+  .mermaid-error {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-ink-soft);
+    text-align: center;
+  }
 
+  .mermaid-error {
+    color: var(--color-danger);
+  }
 
   /* ---------- Math (editorjs-mathcyou) ---------- */
+
   .math-block-wrapper {
     margin: 0.5rem 0;
     padding: 0.75rem 1rem;
@@ -346,10 +311,26 @@
   }
 
   .math-block-preview {
-    display: flex;
-    justify-content: center;
-    padding: 0.5rem 0;
+    display: block;
+    padding: 0.75rem 0.5rem;
     overflow-x: auto;
+    max-width: 100%;
+    /* KaTeX outputs fixed-width spans by default; these rules let the
+       browser reflow long expressions rather than let them overflow. */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .math-block-preview .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    padding: 0.25rem 0;
+  }
+
+  .math-block-preview .katex {
+    font-size: 1.1em;
+    white-space: normal;
   }
 
   .math-block-input {
@@ -370,6 +351,7 @@
   }
 
   /* ---------- Footnotes tune ---------- */
+
   .cdx-footnotes-tune-popover,
   .ej-footnotes {
     font-size: 0.85rem;
@@ -377,6 +359,7 @@
   }
 
   /* ---------- TOC block ---------- */
+
   .toc-tool {
     border: 1px solid var(--color-rule);
     border-radius: 6px;
@@ -391,6 +374,7 @@
   }
 
   /* ---------- Image / Attaches ---------- */
+
   .image-tool__image-picture {
     border-radius: 6px;
   }
@@ -400,125 +384,26 @@
     border-radius: 6px;
   }
 
-    /* Fix Tailwind overriding Editor.js heading sizes */
-  .ce-header {
-    font-family: var(--font-display);
-    font-weight: 700;
-    color: var(--color-ink);
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.25;
-  }
-
-  h1.ce-header {
-    font-size: 2.25rem; /* ~36px */
-  }
-
-  h2.ce-header {
-    font-size: 1.875rem; /* ~30px */
-  }
-
-  h3.ce-header {
-    font-size: 1.5rem; /* ~24px */
-  }
-
-  h4.ce-header {
-    font-size: 1.25rem; /* ~20px */
-  }
-
-  h5.ce-header {
-    font-size: 1.125rem; /* ~18px */
-  }
-
-    /* ---------- Mermaid Layout Block Styles ---------- */
-  .mermaid-block-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--color-paper);
-    border: 1px solid var(--color-rule);
-    border-radius: 6px;
-    margin: 1rem 0;
-  }
-
-  /* Split row design format on desktop reading views */
-  @media (min-width: 768px) {
-    .mermaid-block-wrapper {
-      flex-direction: row;
-      align-items: stretch;
-    }
-  }
-
-  .mermaid-block-input {
-    flex: 1;
-    min-height: 150px;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    padding: 0.75rem;
-    background: white;
-    border: 1px solid var(--color-rule);
-    border-radius: 4px;
-    outline: none;
-    resize: vertical;
-    color: var(--color-ink);
-  }
-
-  .mermaid-block-preview {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border: 1px solid var(--color-rule);
-    border-radius: 4px;
-    padding: 1rem;
-    overflow-x: auto;
-  }
-
-  .mermaid-block-preview svg {
-    max-width: 100%;
-    height: auto;
-  }
-
   /* ---------- Print (PDF export path) ---------- */
+
   @media print {
-      @page {
-    size: A4;
-    margin: 20mm 16mm 22mm 16mm;
-    @bottom-center {
-      content: "Page " counter(page) " of " counter(pages);
-      font-family: var(--font-mono), monospace;
-      font-size: 9pt;
-      color: #5a5650;
-    }
+    @page {
+      size: A4;
+      margin: 20mm 16mm 22mm 16mm;
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: var(--font-mono), monospace;
+        font-size: 9pt;
+        color: #5a5650;
       }
+    }
+
     body {
-      background: white !important;
-      color: #000000 !important;
+      background: white;
     }
 
     .pagebreak-block {
       break-after: page;
-      height: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-  .pagebreak-line,
-  .pagebreak-label {
-    display: none;
-  }
-    
-    /* Prevent tables, quotes, or images from getting chopped in half across lines */
-    .math-block-wrapper,
-    .citation-block,
-    .simple-link-block,
-    .image-tool__image-picture,
-    table,
-    blockquote {
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
     }
 
     .pagebreak-line,
@@ -526,42 +411,39 @@
       display: none;
     }
 
+    .mermaid-toolbar,
+    .mermaid-source {
+      display: none !important;
+    }
+
+    .mermaid-preview {
+      display: flex !important;
+    }
+
+    .mermaid-block {
+      border: none;
+    }
+
+    /* Math: force wrapping so equations never clip at the A4 margin */
+    .math-block-preview {
+      display: block !important;
+      overflow: visible !important;
+      overflow-x: visible !important;
+      max-width: 100% !important;
+      word-break: break-word !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    .math-block-preview .katex-display {
+      overflow: visible !important;
+      max-width: 100% !important;
+      page-break-inside: avoid;
+    }
+
     .ce-toolbar,
     .ce-block--selected,
     .codex-editor--narrow .ce-toolbar {
       display: none !important;
     }
-
-      /* Hide the code entry input fields when saving to a static document */
-    .mermaid-block-input {
-      display: none !important;
-    }
-    
-    .mermaid-block-wrapper {
-      border: none !important;
-      background: transparent !important;
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
-    }
-
-    .mermaid-block-preview {
-      border: none !important;
-      width: 100% !important;
-      
-    }
-
-      .mermaid-toolbar,
-  .mermaid-source {
-    display: none !important;
-  }
-
-  .mermaid-preview {
-    display: flex !important;
-  }
-
-  .mermaid-block {
-    border: none;
-  }
-
   }
 }
