@@ -4,6 +4,31 @@
 
 The proposed system is built on two fundamental pillars: a **hierarchical memory model** that separates transient and persistent knowledge, and a **safe skill update pipeline** that mathematically guarantees no performance regression. Figure 3.1 shows the high‑level architecture, illustrating how the four memory tiers interact with the two operational loops: the *online execution loop* that serves user requests using the currently active skill, and the *offline validation loop* that evaluates candidate skill versions and promotes only those satisfying a strict Pareto improvement condition.
 
+sequenceDiagram
+    participant Dev as Developer
+    participant Val as Validator
+    participant Sandbox as Sandbox Runtime
+    participant Test as Test Suite
+    participant Dep as Deployer
+    participant Sem as Semantic Memory
+    
+    Dev->>Val: Submit candidate v_cand
+    Val->>Sandbox: Load v_cand
+    loop for each (u_i, y_i) in Test Suite
+        Sandbox->>Sandbox: Execute task, produce trace e_i
+        Sandbox->>Test: Compute m(e_i)
+    end
+    Sandbox->>Val: Aggregated m_cand
+    Val->>Sem: Fetch m_current (stored with active version)
+    Val->>Val: Check m_cand > m_current
+    alt Pareto check passes
+        Val->>Dep: Promote v_cand
+        Dep->>Sem: Store v_cand as new version
+        Dep->>Meta: Update active pointer
+    else Pareto check fails
+        Val->>Dev: Reject with reason
+    end
+
     ```mermaid
     flowchart TD
         A[User Query] --> B[Agent Runtime]
