@@ -1,5 +1,5 @@
 import type { BlockTool, BlockToolConstructorOptions } from "@editorjs/editorjs";
-
+import 'katex/dist/katex.min.css';
 export interface MathData {
   latex: string;
 }
