@@ -66,7 +66,7 @@ export function buildEditorTools(documentId: string) {
     config: { 
       levels: [1, 2, 3, 4, 5], 
       defaultLevel: 2, 
-      placeholder: "Heading" 
+      config: { placeholder: "Enter a heading..." }
     },
     tunes: ["alignment"],
   },
@@ -139,12 +139,12 @@ export function buildEditorTools(documentId: string) {
   inlineMath: { 
     class: InlineMathTool 
   },
-
     mermaid: {
     class: MermaidBlock
   },
     math: {
-    class: MathBlock
+    class: MathBlock,
+    inlineToolbar: true,
   },
 
   // ---------- BLOCK TUNES ----------
