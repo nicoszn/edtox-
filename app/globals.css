@@ -47,6 +47,21 @@
 @layer utilities {
   /* ---------- Editor.js surface ---------- */
 
+  .editor-canvas {
+  --page-height: 1122px;       /* A4 at 96dpi */
+  --page-gap: 32px;            /* visual gap between sheets */
+  width: 794px;                /* A4 width at 96dpi */
+  margin: 0 auto;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #ffffff 0,
+    #ffffff calc(var(--page-height)),
+    #e5e5e5 calc(var(--page-height)),
+    #e5e5e5 calc(var(--page-height) + var(--page-gap))
+  );
+  background-attachment: local;
+}
+  
   .codex-editor {
     font-family: var(--font-body);
     color: var(--color-ink);
@@ -198,14 +213,21 @@
     counter-reset: scribe-page 1;
   }
 
-  .pagebreak-block {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-    user-select: none;
-    counter-increment: scribe-page;
-  }
+  .page-break-block {
+  /* This height is the actual "gap" rendered between pages on screen.
+     It must be a KNOWN, FIXED constant so measurement math stays exact. */
+  height: 64px;
+  position: relative;
+  pointer-events: none;
+  user-select: none;
+}
+
+.page-break-marker {
+  position: absolute;
+  top: 32px;
+  left: -9999px; /* visually hidden in normal flow, shown in print preview mode */
+  width: 1px;
+}
 
   .pagebreak-line {
     flex: 1;
@@ -404,6 +426,7 @@
 
     .pagebreak-block {
       break-after: page;
+      height: 0;
     }
 
     .pagebreak-line,
