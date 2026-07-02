@@ -7,7 +7,7 @@ import type { OutputData } from '@editorjs/editorjs';
 
 // Dynamically import with SSR disabled
 const Editor = dynamic(
-  () => import('@/components/editor/Editor'),
+  () => import('@/components/blocks/Editox'),
   {
     ssr: false,
     loading: () => <div className="editor-skeleton">Loading editor...</div>,
