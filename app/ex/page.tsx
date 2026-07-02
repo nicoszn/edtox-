@@ -26,7 +26,7 @@ export default function Ex() {
   };
 
   return (
-    <main style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
+    <main className="min-h-screen" style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
       <h1>Editor.js with Mermaid</h1>
       <Editor
         data={editorData}
