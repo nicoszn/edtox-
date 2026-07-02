@@ -56,6 +56,9 @@ export function buildEditorTools(documentId: string) {
     class: Paragraph,
     inlineToolbar: ["bold", "italic", "underline", "marker", "inlineMath"],
     tunes: ["alignment"],
+    config: {
+    preserveBlank: true // Stops automatic creation of new blocks on simple empty breaks
+  },
   },
   header: {
     class: Header,
