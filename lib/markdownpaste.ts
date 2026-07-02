@@ -1,5 +1,6 @@
 import type { OutputBlockData } from "@editorjs/editorjs";
 
+/** Converts **bold**, *italic*/_italic_, `code`, and [text](url) to the inline HTML Editor.js expects. */
 function inlineMdToHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
@@ -9,7 +10,7 @@ function inlineMdToHtml(text: string): string {
     .replace(/__(.+?)__/g, "<b>$1</b>")
     .replace(/(?<!\*)\*(?!\*)(.+?)\*(?!\*)/g, "<i>$1</i>")
     .replace(/(?<!_)_(?!_)(.+?)_(?!_)/g, "<i>$1</i>")
-    .replace(/`(.+?)`/g, "<code class=\"inline-code\">$1</code>")
+    .replace(/`(.+?)`/g, '<code class="inline-code">$1</code>')
     .replace(/\[(.+?)\]\((\S+?)\)/g, '<a href="$2">$1</a>');
 }
 
@@ -72,7 +73,8 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       i++; // skip closing fence
 
       if (lang === "mermaid") {
-        blocks.push(block("mermaid", { source: contentLines.join("\n") }));
+        // ✅ FIX: Use 'code' instead of 'source' to match the MermaidBlock data contract
+        blocks.push(block("mermaid", { code: contentLines.join("\n") }));
       } else {
         blocks.push(block("code", { code: contentLines.join("\n") }));
       }
