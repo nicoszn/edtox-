@@ -1,6 +1,8 @@
 import type { OutputBlockData } from "@editorjs/editorjs";
 
-/** Converts **bold**, *italic*/_italic_, `code`, and [text](url) to the inline HTML Editor.js expects. */
+/*
+ * Converts **bold**, *italic* / _italic_, `code`, and [text](url) to inline HTML.
+ */
 function inlineMdToHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
@@ -23,7 +25,6 @@ interface ListNode {
   items: ListNode[];
 }
 
-/** Groups consecutive same-style list lines (by indent) into a nested list structure. */
 function buildListItems(lines: { indent: number; text: string }[]): ListNode[] {
   const root: ListNode[] = [];
   const stack: { indent: number; node: ListNode }[] = [];
@@ -41,12 +42,6 @@ function buildListItems(lines: { indent: number; text: string }[]): ListNode[] {
   return root;
 }
 
-/**
- * Parses a markdown string into Editor.js OutputBlockData[]. Covers the
- * subset our registered tools render: headings, paragraphs, bold/italic/
- * inline-code/links, ordered & unordered lists (with indentation nesting),
- * blockquotes, fenced code blocks, tables, and horizontal rules.
- */
 export function markdownToBlocks(markdown: string): OutputBlockData[] {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const blocks: OutputBlockData[] = [];
@@ -60,7 +55,6 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       continue;
     }
 
-    // Fenced code block — check language tag first for mermaid, otherwise generic code
     if (/^```/.test(line.trim())) {
       const fenceLine = line.trim();
       const lang = fenceLine.replace(/^```/, "").trim().toLowerCase();
@@ -70,10 +64,9 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
         contentLines.push(lines[i]);
         i++;
       }
-      i++; // skip closing fence
+      i++;
 
       if (lang === "mermaid") {
-        // ✅ FIX: Use 'code' instead of 'source' to match the MermaidBlock data contract
         blocks.push(block("mermaid", { code: contentLines.join("\n") }));
       } else {
         blocks.push(block("code", { code: contentLines.join("\n") }));
@@ -81,11 +74,9 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       continue;
     }
 
-    // Block math: $$...$$ on its own (possibly multi-line)
     if (/^\$\$/.test(line.trim())) {
       const firstLine = line.trim();
       if (firstLine.length > 2 && firstLine.endsWith("$$")) {
-        // single-line $$...$$ 
         blocks.push(block("mathBlock", { latex: firstLine.slice(2, -2).trim() }));
         i++;
         continue;
@@ -104,23 +95,20 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       continue;
     }
 
-    // Heading
     const headingMatch = /^(#{1,6})\s+(.*)$/.exec(line);
     if (headingMatch) {
-      const level = Math.min(headingMatch[1].length, 3); // our Header tool caps at 3
+      const level = Math.min(headingMatch[1].length, 3);
       blocks.push(block("header", { text: inlineMdToHtml(headingMatch[2]), level }));
       i++;
       continue;
     }
 
-    // Horizontal rule
     if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) {
       blocks.push(block("delimiter", {}));
       i++;
       continue;
     }
 
-    // Blockquote (collect consecutive '>' lines)
     if (/^>\s?/.test(line)) {
       const quoteLines: string[] = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) {
@@ -131,7 +119,6 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       continue;
     }
 
-    // Table (header row + separator row + body rows, pipe-delimited)
     if (line.includes("|") && i + 1 < lines.length && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i + 1])) {
       const rows: string[][] = [];
       const parseRow = (raw: string) =>
@@ -142,7 +129,7 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
           .split("|")
           .map((c) => c.trim());
       rows.push(parseRow(line));
-      i += 2; // skip header + separator
+      i += 2;
       while (i < lines.length && lines[i].includes("|")) {
         rows.push(parseRow(lines[i]));
         i++;
@@ -151,7 +138,6 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       continue;
     }
 
-    // Lists (- * + for unordered, "1." for ordered), with indentation nesting
     const listLineRe = /^(\s*)([-*+]|\d+\.)\s+(.*)$/;
     if (listLineRe.test(line)) {
       const firstMatch = listLineRe.exec(line)!;
@@ -169,7 +155,6 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
       continue;
     }
 
-    // Paragraph: collect consecutive plain lines until a blank line or new construct
     const paraLines: string[] = [line];
     i++;
     while (
@@ -189,7 +174,6 @@ export function markdownToBlocks(markdown: string): OutputBlockData[] {
   return blocks;
 }
 
-/** Quick heuristic: does this pasted text look like markdown worth auto-converting? */
 export function looksLikeMarkdown(text: string): boolean {
   if (!text || text.length < 2) return false;
   const signals = [
