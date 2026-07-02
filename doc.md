@@ -1,304 +1,106 @@
-# Editor.js A4 Pagination — Architecture & Implementation
+Can the Architecture Be Mathematically Proven to Work?
 
-## 1. Core principle: separate "measure" from "mutate"
+The short answer: parts of it can be rigorously proven, but the end‑to‑end learning guarantee cannot — and that is both a limitation and a meaningful insight. Below I break down what can be formalised, what assumptions are needed, and where the boundaries of proof lie.
 
-Never call `blocks.insert()` synchronously inside the function that measures
-height. Use a two-phase loop:
+---
 
-  PHASE A (read)  — runs on a debounced rAF loop, only ever reads the DOM.
-  PHASE B (write) — runs only after PHASE A decides a break is needed,
-                     and only after the user has paused typing.
+1. What “Proven to Work” Means
 
-This single separation eliminates almost the entire class of cursor-jump
-bugs, because you're never mutating blocks while Editor.js's redactor is
-mid-render for the active keystroke.
+For a self‑improving agent, a proof could take several forms:
 
-## 2. PageBreak block: make it structural, not dummy
+· Safety / Non‑Regression Guarantee: Skill quality never decreases.
+· Convergence Guarantee: The system will eventually reach an optimal (or locally optimal) skill.
+· Learning Efficiency Bound: The number of failures needed to reach a certain performance can be bounded.
 
-Your current PageBreak block is "dummy" because it's probably just a static
-tool with no participation in layout. Fix: give it a `render()` that
-outputs a real DOM element with a fixed, known height (e.g. exactly the
-page-margin gap), and tag it with a custom attribute so the measurement
-pass can find every page boundary in O(1) instead of walking generic divs.
+Our architecture’s Validator directly provides the first. The second and third are much harder because they depend on the behaviour of a black‑box LLM optimiser.
 
-\`\`\`typescript
-// tools/PageBreakTool.ts
-import type { BlockTool, BlockToolConstructorOptions, API } from '@editorjs/editorjs';
+---
 
-export default class PageBreakTool implements BlockTool {
-  static get isReadOnlySupported() { return true; }
-  static get toolbox() {
-    return { title: 'Page Break', icon: '<svg>...</svg>' };
-  }
+2. Non‑Regression: A Provable Invariant
 
-  private api: API;
-  private wrapper: HTMLDivElement;
+Let a skill variant s be evaluated by a metric vector \mathbf{m}(s) = (m_1, \dots, m_k) where each m_i is one of the moat observabilities (DT, CF, TEV, SD, HIV). All metrics are normalised so that larger values are better (for SD and HIV we use their complements).
 
-  constructor({ api }: BlockToolConstructorOptions) {
-    this.api = api;
-    this.wrapper = document.createElement('div');
-  }
+The Validator enforces a strict Pareto improvement policy:
 
-  render(): HTMLElement {
-    this.wrapper.classList.add('page-break-block');
-    this.wrapper.setAttribute('data-page-break', 'true');
-    this.wrapper.contentEditable = 'false';
-    // Visual gap representing the bottom margin of the page above
-    // and the top margin of the page below.
-    this.wrapper.innerHTML = `<div class="page-break-marker" aria-hidden="true"></div>`;
-    return this.wrapper;
-  }
+A candidate variant s' replaces the current production variant s if and only if
 
-  save() {
-    return {}; // structural marker, no content payload needed
-  }
+m_i(s') \ge m_i(s) \;\; \forall i \quad \text{and} \quad \exists j \text{ such that } m_j(s') > m_j(s).
 
-  static get sanitize() {
-    return {};
-  }
-}
-\`\`\`
+This gives us:
 
-\`\`\`css
-/* page-break.css */
-.page-break-block {
-  /* This height is the actual "gap" rendered between pages on screen.
-     It must be a KNOWN, FIXED constant so measurement math stays exact. */
-  height: 64px;
-  position: relative;
-  pointer-events: none;
-  user-select: none;
-}
+Theorem 1 (Monotonic Non‑Regression).
+If the metric vector is deterministic (i.e., the same skill always yields the same metrics on the fixed regression suite), then the sequence of production variants (s_t)_{t \ge 0} satisfies
 
-.page-break-marker {
-  position: absolute;
-  top: 32px;
-  left: -9999px; /* visually hidden in normal flow, shown in print preview mode */
-  width: 1px;
-}
+\mathbf{m}(s_{t+1}) \ge \mathbf{m}(s_t) \quad \text{(component‑wise)}
 
-/* Print-mode: this is where page-break-after actually does something */
-@media print {
-  .page-break-block {
-    break-after: page;
-    height: 0;
-  }
-}
-\`\`\`
 
-The key fix here vs. your "dummy block": it has a real, constant pixel
-height that the overflow algorithm can subtract cleanly, and it's queryable
-via `data-page-break="true"` so you never need to walk the whole block tree
-to find existing breaks — `querySelectorAll('[data-page-break]')` gives you
-every boundary already placed.
+with strict inequality in at least one dimension after every successful consolidation. Consequently, no metric ever degrades, and the skill quality never regresses.
 
-## 3. The screen-pagination illusion (fixing bug #2 directly)
+Proof sketch. The Deployer only promotes a variant when the Validator confirms the Pareto condition. The active version pointer is updated atomically. This is an invariant of the deployment loop.
 
-On screen, you cannot literally split one continuous Editor.js redactor
-into separate scrollable page boxes without breaking text flow — that's
-the same wall you already hit. The trick production editors use (Google
-Docs, Word Online) is **visual segmentation via background, not DOM
-slicing**: the editor is one continuous column, but it's rendered on top
-of a repeating CSS background that *looks* like discrete A4 sheets, and
-each PageBreakBlock pushes enough margin to align the next block with the
-top of the next "sheet" in that illusion.
+Practical caveat: The metrics are computed on a finite regression suite, so improvements might not generalise to unseen tasks. However, with respect to the test suite, regression is mathematically impossible.
 
-\`\`\`css
-.editor-canvas {
-  --page-height: 1122px;       /* A4 at 96dpi */
-  --page-gap: 32px;            /* visual gap between sheets */
-  width: 794px;                /* A4 width at 96dpi */
-  margin: 0 auto;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    #ffffff 0,
-    #ffffff calc(var(--page-height)),
-    #e5e5e5 calc(var(--page-height)),
-    #e5e5e5 calc(var(--page-height) + var(--page-gap))
-  );
-  background-attachment: local;
-}
-\`\`\`
+---
 
-This `repeating-linear-gradient` is what actually produces the "stack of
-A4 sheets" look you're after — it's a background pattern that repeats
-every `(page-height + page-gap)` pixels, scrolling with the content via
-`background-attachment: local`. The PageBreakBlock's job becomes much
-simpler: it doesn't create the page illusion, it just needs to land its
-top edge exactly on a `page-height` boundary so the white/gray transition
-lines up with where the text actually breaks. That's a measurement
-problem, solved in step 4.
+3. Local Improvement as a Hill‑Climbing Process
 
-## 4. The overflow algorithm — measure, don't react
+Treat skill quality as a scalar objective Q(s) = \sum_i w_i m_i(s) with positive weights w_i. The consolidation loop attempts to find an s' that increases Q. This is a stochastic local search:
 
-\`\`\`typescript
-// hooks/usePageOverflow.ts
-import { useRef, useCallback } from 'react';
-import type EditorJS from '@editorjs/editorjs';
+· The Optimiser proposes a candidate s' from a neighbourhood \mathcal{N}(s) defined by the LLM’s mutation distribution.
+· The Validator checks if Q(s') > Q(s).
+· If yes, the system moves to s'; otherwise it stays at s.
 
-const PAGE_HEIGHT_PX = 1122; // 297mm @ 96dpi
-const PAGE_BREAK_HEIGHT_PX = 64; // must match PageBreakTool CSS exactly
+This is identical to randomised hill‑climbing (RHC). For RHC, the following is known:
 
-interface OverflowCheckResult {
-  needsBreak: boolean;
-  insertAfterBlockIndex: number;
-}
+Theorem 2 (Convergence to a local maximum).
+If the state space \mathcal{S} of all possible skill variants is finite, and the mutation operator is ergodic (every variant is reachable from any other with positive probability in a finite number of steps), then RHC converges with probability 1 to a state from which no strictly improving neighbour exists — i.e., a local maximum of Q.
 
-export function usePageOverflow(editorRef: React.RefObject<EditorJS | null>) {
-  const rafId = useRef<number | null>(null);
-  const lastCheckedBlockCount = useRef(0);
+Proof. This is a standard result for finite‑state absorbing Markov chains (the set of local maxima are the only absorbing states, and ergodicity ensures they are eventually reached). The same applies here if we consider the LLM’s output as a random variable with full support over syntactically valid components.
 
-  // PHASE A — pure read, runs on rAF, never mutates anything.
-  const measureOverflow = useCallback((): OverflowCheckResult | null => {
-    const editor = editorRef.current;
-    if (!editor) return null;
+Why this doesn’t guarantee practical convergence:
 
-    const holder = document.querySelector('.codex-editor__redactor');
-    if (!holder) return null;
+· The state space \mathcal{S} is astronomically large (all possible code/prompts), making full ergodicity impractical.
+· The LLM is not a uniform random mutator; it is biased toward plausible code, so its effective support may not cover the entire space. A truly global optimum might be unreachable.
+· The metrics are computed on a finite regression suite, so Q is only an approximation of the true performance. Improving on the suite might hurt real performance (“overfitting to the test set”).
 
-    const blockElements = Array.from(
-      holder.querySelectorAll<HTMLElement>('.ce-block')
-    );
+Therefore, while we can prove convergence to a local optimum under idealised assumptions, the assumptions do not hold in practice. The guarantee is only as strong as the LLM’s ability to explore and the test suite’s representativeness.
 
-    // Walk blocks accumulating height, tracking existing page-break
-    // markers to know which "page" we're currently filling.
-    let runningHeight = 0;
-    let currentPageStart = 0;
+---
 
-    for (let i = 0; i < blockElements.length; i++) {
-      const el = blockElements[i];
-      const isBreak = el.querySelector('[data-page-break]') !== null
-        || el.matches('[data-page-break]');
+4. Atomic Decomposition and Diagnoser Correctness
 
-      if (isBreak) {
-        // Reset the running total — a new page starts here.
-        runningHeight = 0;
-        currentPageStart = i + 1;
-        continue;
-      }
+The architecture assumes the Diagnoser can correctly identify the faulty component. This is a classification problem. If we had a formal proof that the critic model’s accuracy is above some threshold, we could bound the probability that optimisation targets the wrong component. In general, no such proof exists for LLM‑based critics. However, if the critic is implemented as a simple rule‑based system (e.g., “if TEV drops, blame Executor; if CF drops, blame ContextManager”), then its correctness can be proven given the metric definitions.
 
-      runningHeight += el.getBoundingClientRect().height;
+Proposition 3 (Rule‑based diagnosis correctness).
+Suppose we define:
 
-      if (runningHeight > PAGE_HEIGHT_PX - PAGE_BREAK_HEIGHT_PX) {
-        // This block is the one that overflowed. The break must be
-        // inserted BEFORE it, not after — it's the block that doesn't fit.
-        return { needsBreak: true, insertAfterBlockIndex: i - 1 };
-      }
-    }
+· Executor failure ↔ TEV decreased and no other metric changed.
+· ContextManager failure ↔ CF decreased and TEV unchanged.
+· DecisionEngine failure ↔ SD increased and CF, TEV unchanged.
 
-    return { needsBreak: false, insertAfterBlockIndex: -1 };
-  }, [editorRef]);
+Then, under the assumption that each component’s behaviour is independent and that metrics perfectly isolate the component’s influence, the Diagnoser will correctly identify the failing component whenever exactly one metric degrades.
 
-  // PHASE B — write, only called after debounce + only if Phase A said yes.
-  const applyBreakIfNeeded = useCallback(async () => {
-    const editor = editorRef.current;
-    if (!editor) return;
+Such a rule‑based approach can be proven correct in a limited, controlled setting, which is acceptable for a student project.
 
-    const result = measureOverflow();
-    if (!result || !result.needsBreak) return;
+---
 
-    // Preserve caret BEFORE mutating — this is the actual fix for bug #1.
-    const currentBlockIndex = editor.blocks.getCurrentBlockIndex();
-    const caretApi = editor.caret;
+5. Can the Whole System Be Proven to “Work”?
 
-    await editor.blocks.insert(
-      'pageBreak',
-      {},
-      undefined,
-      result.insertAfterBlockIndex + 1,
-      false
-    );
+To mathematically prove that the entire system learns optimally, we would need:
 
-    // Restore focus to where the user actually was typing.
-    // Index shifts by +1 because we just inserted a block above it.
-    const restoredIndex =
-      currentBlockIndex >= result.insertAfterBlockIndex + 1
-        ? currentBlockIndex + 1
-        : currentBlockIndex;
+· A formal model of the environment (tasks, user behaviour).
+· A provably convergent optimisation algorithm for the skill space.
+· Guarantees that the metrics capture true performance and that the test suite is representative.
 
-    requestAnimationFrame(() => {
-      caretApi.setToBlock(restoredIndex, 'end');
-    });
-  }, [editorRef, measureOverflow]);
+The current architecture uses an LLM as the optimiser, which is not provably convergent. Therefore, a full end‑to‑end proof of learning is not possible with today’s methods. What we can prove are strong invariants:
 
-  // Debounced trigger — called from onChange, but does NOT measure or
-  // mutate synchronously. It schedules a check for the next idle frame,
-  // after the current keystroke's render cycle has fully settled.
-  const scheduleOverflowCheck = useCallback(() => {
-    if (rafId.current) cancelAnimationFrame(rafId.current);
+1. Safety: The system never violates meta‑memory safety policies.
+2. Non‑regression: Validated skill changes do not worsen measured performance on the test suite.
+3. Traceability: Every decision is fully auditable, making the system verifiable even if not provably optimal.
+4. Locally convergent under idealised conditions (finite state, ergodic mutation).
 
-    rafId.current = requestAnimationFrame(() => {
-      // Second rAF: guarantees we're reading post-layout, post-paint state,
-      // not mid-reflow state from the same frame as the keystroke.
-      rafId.current = requestAnimationFrame(() => {
-        applyBreakIfNeeded();
-      });
-    });
-  }, [applyBreakIfNeeded]);
+These partial proofs provide confidence that the architecture is sound and that the self‑evolution loop is a reasonable heuristic for continuous improvement. In the context of a final‑year project, this level of formalisation demonstrates rigorous thinking while honestly acknowledging the limits of current LLM technology.
 
-  return { scheduleOverflowCheck };
-}
-\`\`\`
+---
 
-## 5. Wiring it into Editor.js's onChange
-
-\`\`\`typescript
-// EditorCanvas.tsx
-import EditorJS from '@editorjs/editorjs';
-import { usePageOverflow } from './hooks/usePageOverflow';
-import PageBreakTool from './tools/PageBreakTool';
-import { useEffect, useRef } from 'react';
-
-export function EditorCanvas() {
-  const editorRef = useRef<EditorJS | null>(null);
-  const { scheduleOverflowCheck } = usePageOverflow(editorRef);
-
-  useEffect(() => {
-    const editor = new EditorJS({
-      holder: 'editor-canvas',
-      tools: {
-        pageBreak: PageBreakTool,
-        // ...your existing block tools
-      },
-      onChange: () => {
-        // CRITICAL: do not measure or mutate here directly.
-        // Just schedule the check for the next settled frame.
-        scheduleOverflowCheck();
-      },
-    });
-
-    editorRef.current = editor;
-    return () => { editor.destroy?.(); };
-  }, [scheduleOverflowCheck]);
-
-  return <div id="editor-canvas" className="editor-canvas" />;
-}
-\`\`\`
-
-## 6. Why this kills bug #1 specifically
-
-Three things had to change simultaneously, not just one:
-
-1. **Double rAF instead of synchronous onChange** — guarantees the DOM has
-   fully settled (layout + paint) before you read heights, and guarantees
-   you're never inserting a block in the same tick as the keystroke that
-   triggered the check.
-2. **Explicit caret save/restore around the insert** — Editor.js does not
-   promise caret stability across `blocks.insert()`. You have to manage it
-   yourself via `editor.caret.setToBlock()`.
-3. **Insert at a computed index, never at the end or at 0** — a generic
-   `blocks.insert('pageBreak')` with no index defaults to inserting at the
-   *current* block or appending, which is almost certainly why you're
-   seeing a jump to the beginning: a default-index insert combined with a
-   stale `currentBlockIndex` reference.
-
-## 7. Known remaining edge case (be aware of this)
-
-Deleting content that causes a *previous* overflow to resolve (page 2
-collapses back into page 1) requires the same measurement pass to detect
-*under*-fill and remove a PageBreakBlock. The algorithm above only grows
-pages forward. If you want pages to also shrink back when text is deleted,
-the same `measureOverflow` function needs a second branch: if a page's
-content height is far below `PAGE_HEIGHT_PX` AND the next page-break
-immediately follows, remove that break via `blocks.delete()` using the
-same save/restore caret pattern.
+Final statement: The architecture cannot be mathematically proven to always learn and reach optimal performance, because its core optimiser is a black‑box language model. However, it can be proven safe and non‑regressive, and under simplified assumptions it exhibits convergence properties. That combination makes it a credible and defensible design for an advanced student project.
