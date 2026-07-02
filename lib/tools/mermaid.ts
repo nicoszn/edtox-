@@ -17,6 +17,7 @@ if (typeof window !== 'undefined') {
 export default class MermaidBlock implements BlockTool {
   private api: API;
   private data: { code: string };
+  private mode: 'edit' | 'preview';
   private wrapper: HTMLDivElement | null = null;
 
   static get toolbox() {
@@ -31,50 +32,94 @@ export default class MermaidBlock implements BlockTool {
     this.data = {
       code: data.code || 'graph TD\n  A[Start] --> B(Process)\n  B --> C{Decision}\n  C -->|Yes| D[Success]\n  C -->|No| E[Error]'
     };
+    // Smart default: preview if source exists, otherwise edit
+    this.mode = data.code ? 'preview' : 'edit';
   }
 
   render(): HTMLDivElement {
     const container = document.createElement('div');
-    container.classList.add('mermaid-block-wrapper');
+    // ✅ SWAPPED: mermaid-block-wrapper → mermaid-block
+    container.classList.add('mermaid-block');
 
+    // ---- Toolbar with toggle button ----
+    const toolbar = document.createElement('div');
+    toolbar.classList.add('mermaid-toolbar');
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.classList.add('mermaid-toggle');
+    toolbar.appendChild(toggleBtn);
+    container.appendChild(toolbar);
+
+    // ---- Source editor (textarea) ----
     const editorSide = document.createElement('textarea');
-    editorSide.classList.add('mermaid-block-input');
+    // ✅ SWAPPED: mermaid-block-input → mermaid-source
+    editorSide.classList.add('mermaid-source');
     editorSide.value = this.data.code;
     editorSide.placeholder = 'Enter Mermaid graph code...';
+    editorSide.spellcheck = false;
+    container.appendChild(editorSide);
 
+    // ---- Preview container ----
     const previewSide = document.createElement('div');
-    previewSide.classList.add('mermaid-block-preview');
+    // ✅ SWAPPED: mermaid-block-preview → mermaid-preview
+    previewSide.classList.add('mermaid-preview');
     
-    // Fallback unique id string generation mapping
     const uniqueId = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
     previewSide.id = uniqueId;
 
-    // Execution parser runner
+    // ---- Core render function (stable logic from mermaid.ts 2.txt) ----
     const renderDiagram = async (codeStr: string) => {
-      if (!codeStr.trim()) return;
+      if (!codeStr.trim()) {
+        previewSide.innerHTML = '<p class="mermaid-empty">No diagram source yet.</p>';
+        return;
+      }
       try {
         previewSide.removeAttribute('data-processed');
-        const { svg } = await mermaid.render(`${uniqueId}-svg`, codeStr);
+        const renderId = `${uniqueId}-svg-${Date.now()}`;
+        const { svg } = await mermaid.render(renderId, codeStr);
         previewSide.innerHTML = svg;
       } catch (err) {
-        // Clear broken syntax configurations from view softly
-        previewSide.innerHTML = `<span class="text-danger text-xs font-mono">Invalid Mermaid Syntax</span>`;
+        console.warn('Mermaid render error:', err);
+        // ✅ SWAPPED: text-danger text-xs font-mono → mermaid-error
+        previewSide.innerHTML = `<span class="mermaid-error">Invalid Mermaid Syntax</span>`;
       }
     };
 
-    // Reactively re-render graphics on user typing events
+    // ---- Live typing updates (only in preview mode) ----
     editorSide.addEventListener('input', (e) => {
       const target = e.target as HTMLTextAreaElement;
       this.data.code = target.value;
-      renderDiagram(target.value);
+      if (this.mode === 'preview') {
+        renderDiagram(target.value);
+      }
     });
+
+    // ---- Mode toggle logic ----
+    const applyMode = () => {
+      const isEdit = this.mode === 'edit';
+      editorSide.style.display = isEdit ? 'block' : 'none';
+      previewSide.style.display = isEdit ? 'none' : 'block';
+      toggleBtn.textContent = isEdit ? 'Preview' : 'Edit source';
+    };
+
+    toggleBtn.addEventListener('click', () => {
+      this.mode = this.mode === 'edit' ? 'preview' : 'edit';
+      applyMode();
+      if (this.mode === 'preview') {
+        renderDiagram(this.data.code);
+      }
+    });
+
+    // ---- Initial setup ----
+    applyMode();
+    if (this.mode === 'preview') {
+      setTimeout(() => renderDiagram(this.data.code), 50);
+    }
 
     container.appendChild(editorSide);
     container.appendChild(previewSide);
     this.wrapper = container;
-
-    // Initial canvas paint execution cycle
-    setTimeout(() => renderDiagram(this.data.code), 50);
 
     return container;
   }
