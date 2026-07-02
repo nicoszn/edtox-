@@ -7,13 +7,6 @@ The proposed system is built on two fundamental pillars: a **hierarchical memory
 Plot the function
 
 $$y = x^2 + 2x - 3$$
-
-and verify it matches this flow:
-
-```mermaid
-graph TD
-  A[Input x] --> B[Compute x^2 + 2x - 3]
-  B --> C[Output y]
         
 
 **Figure 3.1: System architecture. Solid arrows represent data flow; dashed arrows represent control or configuration references.**
