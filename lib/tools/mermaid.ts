@@ -65,7 +65,8 @@ export default class MermaidBlock implements BlockTool {
     // ✅ SWAPPED: mermaid-block-preview → mermaid-preview
     previewSide.classList.add('mermaid-preview');
     
-    const uniqueId = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+   // const uniqueId = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+    const uniqueId = `mermaid-${Math.random().toString(36).slice(2, 11)}`;
     previewSide.id = uniqueId;
 
     // ---- Core render function (stable logic from mermaid.ts 2.txt) ----
