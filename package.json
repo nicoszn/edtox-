@@ -12,7 +12,7 @@
     "next": "16.2.4",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "@editorjs/editorjs": "^2.30.8",
+    "@editorjs/editorjs": "^2.31.6",
     "@editorjs/header": "^2.8.8",
     "@editorjs/list": "^2.0.6",
     "@editorjs/paragraph": "^2.11.7",
