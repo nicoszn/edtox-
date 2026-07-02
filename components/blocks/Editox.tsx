@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
-import MermaidBlock from './blocks/MermaidBlock';
+import MermaidBlock from './MermaidBlock';
 
 // Optional: Import additional official tools as needed
 // import Header from '@editorjs/header';
