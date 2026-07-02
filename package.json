@@ -34,7 +34,12 @@
     "docx": "^9.7.1",
     "jszip": "^3.10.1",
     "file-saver": "^2.0.5",
-    "mermaid": "11.15.0"
+    "mermaid": "11.15.0",
+    "react-textarea-autosize": "8.5.9",
+    "react-hook-form": "7.80.0",
+    "react-hooks-global-state": "2.1.0",
+    "react-swipeable": "7.0.2",
+    "editorjs-html": "4.0.5",
   },
   "devDependencies": {
     "typescript": "6.0.3",
