@@ -4,6 +4,17 @@
 
 The proposed system is built on two fundamental pillars: a **hierarchical memory model** that separates transient and persistent knowledge, and a **safe skill update pipeline** that mathematically guarantees no performance regression. Figure 3.1 shows the high‑level architecture, illustrating how the four memory tiers interact with the two operational loops: the *online execution loop* that serves user requests using the currently active skill, and the *offline validation loop* that evaluates candidate skill versions and promotes only those satisfying a strict Pareto improvement condition.
 
+Plot the function
+
+$$y = x^2 + 2x - 3$$
+
+and verify it matches this flow:
+
+```mermaid
+graph TD
+  A[Input x] --> B[Compute x^2 + 2x - 3]
+  B --> C[Output y]
+
 sequenceDiagram
     participant Dev as Developer
     participant Val as Validator
@@ -62,7 +73,7 @@ sequenceDiagram
             M
             N
         end
-        ```
+        
 
 **Figure 3.1: System architecture. Solid arrows represent data flow; dashed arrows represent control or configuration references.**
 
