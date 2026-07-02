@@ -16,7 +16,7 @@ interface EditorProps {
   placeholder?: string;
 }
 
-export default function Editor({
+export default function Editox({
   data,
   onChange,
   readOnly = false,
