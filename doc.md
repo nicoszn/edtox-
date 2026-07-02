@@ -14,65 +14,6 @@ and verify it matches this flow:
 graph TD
   A[Input x] --> B[Compute x^2 + 2x - 3]
   B --> C[Output y]
-
-sequenceDiagram
-    participant Dev as Developer
-    participant Val as Validator
-    participant Sandbox as Sandbox Runtime
-    participant Test as Test Suite
-    participant Dep as Deployer
-    participant Sem as Semantic Memory
-    
-    Dev->>Val: Submit candidate v_cand
-    Val->>Sandbox: Load v_cand
-    loop for each (u_i, y_i) in Test Suite
-        Sandbox->>Sandbox: Execute task, produce trace e_i
-        Sandbox->>Test: Compute m(e_i)
-    end
-    Sandbox->>Val: Aggregated m_cand
-    Val->>Sem: Fetch m_current (stored with active version)
-    Val->>Val: Check m_cand > m_current
-    alt Pareto check passes
-        Val->>Dep: Promote v_cand
-        Dep->>Sem: Store v_cand as new version
-        Dep->>Meta: Update active pointer
-    else Pareto check fails
-        Val->>Dev: Reject with reason
-    end
-
-    ```mermaid
-    flowchart TD
-        A[User Query] --> B[Agent Runtime]
-        B --> C[Working Memory]
-        B --> D[Episodic Memory]
-        E[Meta‑Memory] --> B
-        F[Semantic Memory] --> B
-        B --> G[Response]
-        
-        subgraph Online Execution
-            B
-            C
-            D
-        end
-        
-        H[Developer] --> I[Candidate Skill]
-        I --> J[Validator]
-        J --> K[Episodic Memory - Test Runs]
-        K --> J
-        J --> L{Pareto Check}
-        L -->|Pass| M[Deployer]
-        M --> F
-        M --> E
-        L -->|Fail| N[Reject]
-        
-        subgraph Offline Validation
-            I
-            J
-            K
-            L
-            M
-            N
-        end
         
 
 **Figure 3.1: System architecture. Solid arrows represent data flow; dashed arrows represent control or configuration references.**
