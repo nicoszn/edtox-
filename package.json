@@ -30,7 +30,7 @@
     "@phigoro/editorjs-toc": "^1.1.11",
     "editorjs-text-alignment-blocktune": "^1.0.3",
     "editorjs-mathcyou": "^1.0.0",
-    "katex": "^0.13.24",
+    "katex": "^0.17.0",
     "docx": "^9.7.1",
     "jszip": "^3.10.1",
     "file-saver": "^2.0.5",
@@ -54,15 +54,15 @@
     "typescript": "6.0.3",
     "@types/katex": "0.16.8",
     "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
+    "@types/react": "^19.2.17",
     "@types/markdown-it": "14.1.2",
     "@types/markdown-it-container": "4.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/file-saver": "^2.0.7",
-    "tailwindcss": "^4.1.0",
+    "tailwindcss": "^4.3.2",
     "@tailwindcss/postcss": "^4.1.0",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.3.0",
-    "postcss": "^8.5.3"
+    "postcss": "^8.5.16"
   }
 }
