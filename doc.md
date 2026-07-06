@@ -1,3 +1,15 @@
+Plot the function
+
+$$y = x^2 + 2x - 3$$
+
+and verify it matches this flow:
+
+```mermaid
+graph TD
+  A[Input x] --> B[Compute x^2 + 2x - 3]
+  B --> C[Output y]
+```
+
 ## Chapter 3: System Design and Architecture
 
 ### 3.1 Overall Architecture Overview
@@ -72,7 +84,9 @@ $\mathcal{M}$ is stored in a version‑controlled file and is only updated manua
 
 Every agent skill is decomposed into four independently replaceable components, each conforming to a strict interface that exposes its internal state for inspection.
 
-    classDiagram
+    
+```mermaid
+    classDiagram 
         class InputParser {
             +parse(raw: Any) : Dict
             +hook_input_parsed(raw, parsed)
@@ -92,6 +106,7 @@ Every agent skill is decomposed into four independently replaceable components, 
         InputParser --> ContextManager : parsed
         ContextManager --> DecisionEngine : context
         DecisionEngine --> Executor : action
+```
 
 **Figure 3.2: Atomic skill components and data flow.**
 
@@ -187,6 +202,7 @@ This rule guarantees that the sequence of accepted versions forms a monotonicall
 
 #### 3.5.1 Validation Protocol
 
+```mermaid
     sequenceDiagram
         participant Dev as Developer
         participant Val as Validator
@@ -211,6 +227,7 @@ This rule guarantees that the sequence of accepted versions forms a monotonicall
         else Pareto check fails
             Val->>Dev: Reject with reason
         end
+```
 
 **Figure 3.3: Validation and deployment protocol.**
 
