@@ -9,7 +9,7 @@ interface OverflowCheckResult {
   insertAfterBlockIndex: number;
 }
 
-export function usePageOverflow(editorRef: React.RefObject<EditorJS | null>) {
+export default function usePageOverflow(editorRef: React.RefObject<EditorJS | null>) {
   const rafId = useRef<number | null>(null);
   const lastCheckedBlockCount = useRef(0);
 
