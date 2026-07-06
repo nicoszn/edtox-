@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import type { DocumentMeta } from "@/types/document"
 import { listDocuments, createDocument } from "@/lib/storage/documents"
-import DocumentCard from "@/components/home/DocumentCard"
+import DocumentCard from "@/components/DocumentCard"
 
 export default function HomePage() {
   const router = useRouter()
