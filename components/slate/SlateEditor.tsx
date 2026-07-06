@@ -30,12 +30,11 @@ export default function SlateEditor({ documentId }: { documentId: string }) {
 
   useEffect(() => {
     getDocument(documentId).then((doc) => {
-      if (!doc) return
-      setTitle(doc.title)
+      if (doc) setTitle(doc.title)
       // Slate's initialValue is set once; use setValue to hydrate from storage
-      if (doc.content?.blocks?.length) {
-        // stored as EditorJS OutputData — start fresh for new slate doc
-      }
+      // if (doc.content?.blocks?.length) {
+      //   // stored as EditorJS OutputData — start fresh for new slate doc
+      // }
       setLoaded(true)
     })
   }, [documentId])
