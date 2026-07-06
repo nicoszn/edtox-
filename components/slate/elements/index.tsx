@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState, useRef, useEffect } from "react"
+import React, { useCallback, useState, useRef, useEffect } from "react"
 import { Transforms } from "slate"
 import { RenderElementProps, useSlateStatic, useSelected } from "slate-react"
 import katex from "katex"
@@ -178,7 +178,7 @@ export function PageBreakEl({
 export function renderElement(
   props: RenderElementProps,
   pageIndex: PageIndex
-): JSX.Element {
+): React.ReactElement {
   const el = props.element as CustomElement
   switch (el.type) {
     case "heading-1":    return <h1 {...props.attributes} className="ce-header">{props.children}</h1>
