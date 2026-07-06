@@ -5,7 +5,7 @@ import { usePageOverflow } from './hooks/usePageOverflow';
 import PageBreakTool from './tools/PageBreakTool';
 import { useEffect, useRef } from 'react';
 
-export function EditorCanvas() {
+export default function EditorCanvas() {
   const editorRef = useRef<EditorJS | null>(null);
   const { scheduleOverflowCheck } = usePageOverflow(editorRef);
 
