@@ -5,7 +5,6 @@ import { Editor, Transforms, Element } from "slate"
 import { useSlate } from "slate-react"
 import { CustomEditor, CustomElement, CustomText, BlockType } from "@/lib/slate/types"
 
-// Reusable type helper that excludes the 'text' key from formatting actions
 type MarkFormat = keyof Omit<CustomText, "text">
 
 function isMarkActive(editor: CustomEditor, format: MarkFormat) {
@@ -52,30 +51,49 @@ interface ToolbarProps {
 export function SlateToolbar({ preview, onTogglePreview }: ToolbarProps) {
   const editor = useSlate()
 
+  // Strong types for the toolbar dictionary maps
+  const markLabels: Record<MarkFormat, string> = {
+    bold: "B",
+    italic: "I",
+    underline: "U",
+    code: "</>",
+    highlight: "H"
+  }
+
+  // Explicitly mapping only the subset of BlockTypes used as layout text buttons
+  const blockLabels: Record<Extract<BlockType, "heading-1" | "heading-2" | "heading-3" | "quote" | "code" | "bulleted-list" | "numbered-list">, string> = {
+    "heading-1": "H1",
+    "heading-2": "H2",
+    "heading-3": "H3",
+    "quote": "❝",
+    "code": "{ }",
+    "bulleted-list": "•–",
+    "numbered-list": "1."
+  }
+
   return (
     <div className="slate-toolbar">
-      {(["bold", "italic", "underline", "code", "highlight"] as MarkFormat[]).map((mark) => (
+      {(Object.keys(markLabels) as MarkFormat[]).map((mark) => (
         <button
           key={mark}
           type="button"
           className={`slate-toolbar-btn ${isMarkActive(editor, mark) ? "active" : ""}`}
           onMouseDown={(e) => { e.preventDefault(); toggleMark(editor, mark) }}
         >
-          {{ bold: "B", italic: "I", underline: "U", code: "</>", highlight: "H" }[mark]}
+          {markLabels[mark]}
         </button>
       ))}
 
       <span className="slate-toolbar-divider" />
 
-      {(["heading-1", "heading-2", "heading-3", "quote", "code", "bulleted-list", "numbered-list"] as BlockType[]).map((t) => (
+      {(Object.keys(blockLabels) as (keyof typeof blockLabels)[]).map((t) => (
         <button
           key={t}
           type="button"
           className={`slate-toolbar-btn ${isBlockActive(editor, t) ? "active" : ""}`}
           onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, t) }}
         >
-          {{ "heading-1": "H1", "heading-2": "H2", "heading-3": "H3",
-             "quote": "❝", "code": "{ }", "bulleted-list": "•–", "numbered-list": "1." }[t]}
+          {blockLabels[t]}
         </button>
       ))}
 
