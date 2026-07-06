@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "VForge — Professional Media Tools",
+  title: "Edtox — Professional Editing Tools",
   description:
-    "Browser-native media editing suite. Trim, convert, compress, flip, reverse and transform video and audio — entirely in your browser. No uploads, no servers.",
-  keywords: ["video editor", "media tools", "ffmpeg", "browser", "convert", "compress"],
+    "Browser-native editor suite entirely in your browser.",
+  keywords: ["Document editor", "edit tools"],
   openGraph: {
-    title: "VForge — Professional Media Tools",
-    description: "Browser-native media editing suite",
+    title: "Edtox — Professional Editing Tools",
+    description: "Browser-native editor suite entirely in your browser",
     type: "website",
   },
 };
