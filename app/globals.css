@@ -45,6 +45,97 @@
 }
 
 @layer utilities {
+
+  /* ── Slate toolbar ─────────────────────────────────────────────────────── */
+.slate-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-paper);
+  position: sticky;
+  top: 57px;
+  z-index: 9;
+}
+
+.slate-toolbar-btn {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  border: none;
+  background: none;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.slate-toolbar-btn:hover,
+.slate-toolbar-btn.active {
+  background: rgba(139, 90, 60, 0.1);
+  color: var(--color-umber);
+}
+
+.slate-toolbar-divider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--color-rule);
+  margin: 0 0.25rem;
+}
+
+/* ── A4 layout ─────────────────────────────────────────────────────────── */
+.slate-a4-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 8rem;
+  background: var(--color-rule);
+  min-height: calc(100vh - 110px);
+}
+
+.slate-a4-editable {
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  padding: 20mm 16mm 22mm;
+  background: var(--color-paper);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+/* ── Inline math void ──────────────────────────────────────────────────── */
+.inline-math-void {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.inline-math-input {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  border: 1px solid var(--color-umber-soft);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  outline: none;
+  background: var(--color-paper);
+  min-width: 80px;
+}
+
+.inline-math-preview {
+  cursor: pointer;
+  padding: 0 0.15rem;
+  border-radius: 3px;
+}
+
+.inline-math-preview:hover {
+  background: rgba(139, 90, 60, 0.08);
+}
+
+  
   /* ---------- Editor.js surface ---------- */
 
   .editor-canvas {
