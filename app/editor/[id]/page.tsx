@@ -7,9 +7,9 @@ import { getDocument, saveDocument } from "@/lib/storage/documents";
 import { countWords } from "@/lib/wordcount";
 import { countPages } from "@/lib/pages";
 import { EMPTY_CONTENT } from "@/types/document";
-import TitleBar from "@/components/TitleBar";
-import EditorCanvas from "@/components/EditorCanvas";
-import Toolbar from "@/components/Toolbar";
+import TitleBar from "@/components/editor/TitleBar";
+import EditorCanvas from "@/components/editor/EditorCanvas";
+import Toolbar from "@/components/editor/Toolbar";
 
 const SAVE_DEBOUNCE_MS = 600;
 
