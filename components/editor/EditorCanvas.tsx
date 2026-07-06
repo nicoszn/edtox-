@@ -1,8 +1,8 @@
 "use client";
 
 import EditorJS from '@editorjs/editorjs';
-import { usePageOverflow } from './hooks/usePageOverflow';
-import PageBreak from './tools/PageBreak';
+import  usePageOverflow  from '@/hooks/usePageOverflow';
+import PageBreak from '@/tools/PageBreak';
 import { useEffect, useRef } from 'react';
 
 export default function EditorCanvas() {
