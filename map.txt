@@ -1,0 +1,50 @@
+scribe/
+├── app/
+│   ├── editor/
+│   │   └── [id]/
+│   │       └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── editor/
+│   │   ├── EditorCanvas.tsx
+│   │   ├── TitleBar.tsx
+│   │   └── Toolbar.tsx
+│   └── home/
+│       ├── DocumentCard.tsx
+│       └── NewDocumentButton.tsx
+├── lib/
+│   ├── export/
+│   │   ├── docx.ts
+│   │   ├── index.ts
+│   │   ├── markdown.ts
+│   │   ├── model.ts
+│   │   ├── pdf.ts
+│   │   ├── plaintext.ts
+│   │   └── zip.ts
+│   ├── storage/
+│   │   ├── assets.ts
+│   │   ├── db.ts
+│   │   ├── documents.ts
+│   │   ├── rehydrate.ts
+│   │   └── uploader.ts
+│   ├── tools/
+│   │   ├── citation.ts
+│   │   ├── index.ts
+│   │   ├── mathblock.ts
+│   │   ├── mermaid.ts
+│   │   ├── pagebreak.ts
+│   │   └── simplelink.ts
+│   ├── markdownpaste.ts
+│   ├── orchestrator.ts
+│   ├── pages.ts
+│   ├── scrollguard.ts
+│   └── wordcount.ts
+├── types/
+│   ├── citation.ts
+│   └── document.ts
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+└── tsconfig.json
