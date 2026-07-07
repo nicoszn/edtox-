@@ -194,7 +194,7 @@ Let $e = (u, p, C, r, a, o, \sigma)$ be a trace. Define the embedding function $
 
 For a task trace, let $D$ be the set of atomic decisions (actions chosen). A decision is *traceable* if its full causal chain is present. Then:
 
-$$\text{DT}(e) = \frac{| \{ d \in D : \text{causal_path}(d) \text{ is complete} \} |}{|D|}$$
+\text{DT}(e) = \frac{| \{ d \in D : \text{causal\_path}(d) \text{ is complete} \} |}{|D|}
 
 When all components are instrumented, $\text{DT} = 1$.
 
