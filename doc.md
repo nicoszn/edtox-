@@ -10,6 +10,83 @@ graph TD
   B --> C[Output y]
 ```
 
+
+# Chapter 1: Introduction
+
+## 1.1 Background
+
+The rapid advancement of large language models (LLMs) has given rise to a new class of software systems known as autonomous agents. These agents combine natural language understanding, reasoning, retrieval of external knowledge, and interaction with tools to perform complex multi‑step tasks. Developers can now assemble agents by composing specialised components: a retrieval module fetches relevant documents from a knowledge base, a reasoning module decides on the next action or produces a final answer, and a collection of tool executors carries out commands in the digital or physical world. This compositional approach, supported by frameworks such as LangGraph and DSPy, has enabled remarkable flexibility and capability.
+
+Despite these advances, the process of maintaining and improving such agents remains fraught with risk. An agent’s behaviour emerges from the intricate interplay of its components, and even a well‑intentioned modification to one part — for instance, a new prompt template, a different embedding model, or a revised tool‑calling strategy — can silently break previously reliable functionality. In production environments, where trust and stability are critical, any unverified degradation can have serious consequences. The fundamental challenge is not the initial construction of agents but their ongoing, safe evolution.
+
+## 1.2 Problem Statement
+
+Current practices for updating LLM‑based agents lack formal guarantees against performance regression. Developers typically rely on ad‑hoc manual testing or a handful of example queries to validate a change. This approach is insufficient because agent performance is multi‑dimensional: a change that improves answer accuracy might simultaneously increase the retrieval of irrelevant context, introduce semantic drift over the course of a conversation, or cause tool invocations to fail silently. Traditional regression testing, while valuable, evaluates only whether specific outputs match expected values; it does not provide a principled framework for deciding whether a change is acceptable when multiple quality dimensions are affected.
+
+Furthermore, there is no standardised, auditable mechanism for managing the lifecycle of agent skills. Without versioned, component‑level tracking and a rigorous promotion process, it is difficult to trace why a particular behaviour changed or to roll back a faulty update to a known good state. This fragility inhibits the development of reliable, continuously improving agent systems and is particularly concerning as agents are deployed in high‑stakes domains such as healthcare, legal research, and personal assistants.
+
+## 1.3 Proposed Solution
+
+This project addresses the problem by introducing a hierarchical memory architecture that enforces a provable non‑regression guarantee on all skill updates. The architecture organises an agent’s knowledge into four distinct memory tiers inspired by cognitive psychology: working memory, episodic memory, semantic memory, and meta‑memory. Every agent skill is decomposed into four atomically replaceable components — Input Parser, Context Manager, Decision Engine, and Executor — each with a well‑defined interface and observability hooks.
+
+To quantify skill quality, we define five deterministic, computable metrics termed moat observabilities: Decision Traceability, Context Fidelity, Tool Execution Veracity, Semantic Drift, and Human Intervention Velocity. These metrics are computed directly from execution traces without reliance on subjective language model judgments, ensuring objectivity.
+
+The core innovation is a safe update mechanism based on the Pareto improvement principle. A new version of a skill is accepted only if every one of the five metrics is at least as high as the current production version and at least one metric is strictly higher. This rule mathematically guarantees that accepted updates never degrade performance on any measured dimension with respect to a curated regression test suite. The entire framework is built using only free, locally executable models and lightweight databases, making it accessible to developers with limited hardware resources.
+
+## 1.4 Research Questions
+
+This project is guided by the following research questions:
+
+1. How can a hierarchical memory architecture support safe, versioned skill evolution in LLM‑based agents?
+2. What set of deterministic, computable metrics can capture the multi‑dimensional quality of an agent skill?
+3. How can a formal Pareto improvement rule be applied to skill promotion to guarantee non‑regression?
+4. Can a minimal prototype demonstrate the feasibility and correctness of the non‑regression guarantee using only free, local resources?
+
+## 1.5 Scope and Delimitations
+
+The project focuses on the design and prototyping of the memory architecture and the non‑regression validation mechanism. It does not aim to create a fully autonomous self‑evolution loop where an LLM generates skill variants automatically; rather, skill variants are authored by a developer. The system is evaluated on a small, curated test suite and a single retrieval‑augmented question‑answering task to demonstrate the core principles. While the architecture is extensible to multi‑agent settings, the prototype implements a single agent with multiple versioned retrieval skills. The evaluation is limited to the five defined metrics; other quality dimensions such as latency, cost, or user satisfaction are not considered in this work.
+
+## 1.6 Report Structure
+
+The remainder of this report is organised as follows. Chapter 2 reviews relevant literature on cognitive architectures, self‑improving agents, skill decomposition, and safe update mechanisms. Chapter 3 presents the system design and architecture in detail, including the memory hierarchy, atomic skill interface, metric definitions, and the validation protocol. Chapter 4 describes the implementation of the proof‑of‑concept prototype and the testing process. Chapter 5 evaluates the system against the research questions, discusses limitations, and concludes with directions for future work.
+
+# Chapter 2: Literature Review
+
+## 2.1 Cognitive Memory Architectures
+
+The notion that an intelligent system can be organised around distinct memory stores traces its roots to foundational work in cognitive psychology. Atkinson and Shiffrin (1968) proposed a multi‑store model that separated sensory memory, short‑term memory, and long‑term memory, each with different capacities and persistence. Baddeley and Hitch (1974) refined the short‑term store into a working memory system with multiple components, while Tulving (1972) drew a critical distinction within long‑term memory between episodic memory (personal experiences tied to time and place) and semantic memory (general knowledge and facts). These conceptual divisions have deeply influenced artificial intelligence.
+
+In AI, cognitive architectures such as ACT‑R (Anderson & Lebiere, 1998) and SOAR (Laird, 2012) operationalised memory hierarchies by maintaining separate declarative and procedural memories and using production rules to govern behaviour. More recently, Park et al. (2023) demonstrated generative agents that used a hybrid memory stream: agents retrieved past experiences (episodic) and world knowledge (semantic) to inform their behaviour in a simulated environment. These works validate the utility of memory hierarchies for organising complex agent behaviour, but they do not address how the knowledge stored in those memories — particularly the skills an agent uses — can be safely updated over time. Our work extends the cognitive memory model to the domain of LLM‑based agent skill management, treating executable skills as versioned semantic memories and enforcing a formal update discipline.
+
+## 2.2 Self‑Improving Language Agents
+
+The capacity of large language models to reason about their own outputs has spurred research into agents that can improve autonomously. Shinn et al. (2023) introduced Reflexion, where an agent verbally reflects on a failure trajectory and uses that reflection as additional context in subsequent attempts. While this loop can correct single‑task errors, the learned lessons are not persisted across tasks, nor is there any guarantee that the new behaviour will not regress on previously solved tasks.
+
+Wang et al. (2024) proposed Skills‑Coach, an interactive system in which a human and an LLM collaborate to decompose tasks into named skills that are stored in a library for future reuse. This marked an important step toward treating skills as persistent, retrievable units. Voyager (Wang et al., 2023) took the idea further by building an agent that autonomously writes and refines code skills in the Minecraft environment, storing them in a vector database and retrieving them by embedding similarity. Voyager’s skill manager demonstrates the power of a versioned, searchable skill library. However, it lacks any formal non‑regression constraint: a newly synthesised skill simply replaces the old one, with no guarantee that previously mastered tasks remain solvable. Our project directly addresses this shortcoming by adding a validation gate based on quantitative metrics.
+
+## 2.3 Modular Agent Frameworks and Skill Decomposition
+
+The decomposition of agent behaviour into smaller, independently manageable modules is a principle borrowed from software engineering and recently applied to LLM‑based systems. Khattab et al. (2023) developed DSPy, a programming framework that treats every LLM call as a declarative module with a defined input‑output signature. DSPy’s teleprompter can optimise module prompts using a metric‑driven compiler, and the modules are composable. This modularity resembles our atomic skill interface, where each skill is split into four components with clear boundaries. Similarly, LangGraph (Chase, 2023) encourages developers to construct agents as stateful graphs of discrete nodes, each representing a reasoning step or tool invocation, enabling fine‑grained inspection and modification.
+
+These frameworks provide the technical foundation for building agents out of replaceable parts, but they do not prescribe how the parts should be versioned, tested, and promoted. Our work builds on their composability by defining a fixed four‑component interface and coupling it with a memory hierarchy that tracks versions and enforces a formal promotion policy.
+
+## 2.4 Agent Observability and Evaluation Metrics
+
+Reliable evaluation is essential for any safe update mechanism. Traditional benchmarks such as HotpotQA (Yang et al., 2018) and StrategyQA (Geva et al., 2021) measure end‑to‑end task success but offer little insight into which internal component caused a failure. AgentBench (Liu et al., 2023) addresses this to some extent by evaluating reasoning, tool use, and planning separately. In the observability domain, tools like LangSmith (2024) and Phoenix (Arize AI, 2024) capture detailed execution traces — prompts, retrieved documents, intermediate outputs — enabling developers to compute component‑level diagnostics.
+
+We draw on this trace‑based approach to define five moat observability metrics. Unlike ad‑hoc inspection, our metrics are designed to be computed deterministically from the trace, without any reliance on subjective LLM judgments. This determinism is critical for the mathematical non‑regression guarantee we aim to provide.
+
+## 2.5 Safe Update Mechanisms and Continual Learning
+
+The challenge of updating a system without degrading existing capabilities is well studied in both software engineering and machine learning. Regression testing and continuous integration pipelines are standard practices for catching unintended breakages, but they typically rely on binary pass/fail assertions. When a change affects multiple quality dimensions — some improving, others worsening — a principled decision procedure is needed. Multi‑objective optimisation offers the concept of Pareto improvement (Miettinen, 1999): a change is accepted if it makes no objective worse and at least one better. To our knowledge, this principle has not been directly applied as a promotion gate for agent skill versions.
+
+In machine learning, continual learning research addresses the problem of catastrophic forgetting. Techniques such as elastic weight consolidation (Kirkpatrick et al., 2017) and experience replay (Rolnick et al., 2019) constrain the update process to preserve knowledge of old tasks. Our work can be seen as a discrete, test‑suite‑based analogue: instead of constraining model weights, we constrain the accepted versions of skill code using a Pareto condition on a fixed set of metrics. This provides a formal non‑regression guarantee without requiring access to model internals or training data.
+
+## 2.6 Summary and Research Gap
+
+The literature provides rich components: cognitive memory hierarchies for organising agent knowledge, self‑reflection and skill libraries for improvement, modular frameworks for composable skills, trace‑based tools for observability, and continual learning techniques for preventing forgetting. However, no existing system combines these elements into a single architecture that (a) treats agent skills as versioned semantic memories, (b) decomposes skills into atomically replaceable components, (c) defines a fixed set of deterministic quality metrics, and (d) enforces a provable Pareto‑based non‑regression guarantee on every skill update. This project occupies that intersection, offering a principled and practical foundation for safe agent skill evolution.
+
+
 ## Chapter 3: System Design and Architecture
 
 ### 3.1 Overall Architecture Overview
