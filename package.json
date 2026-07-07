@@ -29,7 +29,6 @@
     "@editorjs/footnotes": "^1.1.0",
     "@phigoro/editorjs-toc": "^1.1.11",
     "editorjs-text-alignment-blocktune": "^1.0.3",
-    "editorjs-mathcyou": "^1.0.0",
     "katex": "^0.13.24",
     "docx": "^9.7.1",
     "jszip": "^3.10.1",
