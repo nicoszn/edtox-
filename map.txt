@@ -11,9 +11,9 @@ scribe/
 │   │   ├── EditorCanvas.tsx
 │   │   ├── TitleBar.tsx
 │   │   └── Toolbar.tsx
-│   └── home/
-│       ├── DocumentCard.tsx
-│       └── NewDocumentButton.tsx
+│ 
+│   ├── DocumentCard.tsx
+│   └── NewDocumentButton.tsx
 ├── lib/
 │   ├── export/
 │   │   ├── docx.ts
