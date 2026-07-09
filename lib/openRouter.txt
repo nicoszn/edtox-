@@ -1,7 +1,7 @@
 fetch('https://openrouter.ai/api/v1/chat/completions', {
   method: 'POST',
   headers: {
-    Authorization: 'Bearer sk-or-v1-5355ce0608886856d0caab1c0d91dded75f381255024a47ff603c5a4f7de6c',
+    Authorization: 'Bearer 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',
     'HTTP-Referer': '<YOUR_SITE_URL>',
     'X-Title': '<YOUR_SITE_NAME>',
     'Content-Type': 'application/json',
