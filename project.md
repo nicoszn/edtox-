@@ -64,3 +64,72 @@ Appendices & References
 · Appendix A: Complete Proof of Routing Convergence
 · Appendix B: Extended Hyperparameter Tables
 · References (Academic citations matching modern AI standards)
+
+
+Here is the revised Chapter 1 with section 1.4 and its contents removed. The "Summary of Core Contributions" has been retained as a standalone closing section.
+
+---
+
+Chapter 1: Introduction
+
+1.1 Context and Motivation
+
+Large Language Models (LLMs) have shifted artificial intelligence from static pattern recognition to dynamic, autonomous agents. Modern LLMs exhibit advanced in-context learning capabilities. They can formulate plans, execute tools, and reason through multi-step problems when provided with historical context.
+
+When these autonomous agents are deployed within cooperative frameworks—known as Multi-Agent Systems (MAS)—their capabilities scale significantly. In an LLM-based MAS, specialized agents assume distinct roles, such as software engineers, quality assurance testers, or project managers, and collaborate to achieve complex objectives.
+
+However, the operational execution of these systems is bound by the fundamental mechanics of the Transformer architecture. The underlying Attention mechanism scales quadratically O(N^2) regarding sequence length. This scaling creates a strict physical and computational limit on the context window.
+
+As a result, long-term collaboration requires agents to continuously exchange messages, which quickly fills their context windows. Managing cross-agent communication and tracking long-horizon task execution requires scalable, structured information persistence.
+
+1.2 The Problem of Context Degradation
+
+When multi-agent systems operate over extended horizons, they experience acute performance degradation due to three core architectural bottlenecks:
+
+```
+[Continuous Agent Messages] ──> [Quadratic O(N²) Attention Cost] ──> [Context Window Saturation]
+                                                                             │
+       ┌─────────────────────────────────────────────────────────────────────┤
+       ▼                                                                     ▼
+[Attention Dilution]                                                [Needle-in-a-Haystack Loss]
+(Distraction by noise)                                              (Loss of vital historical data)
+```
+
+1. Attention Dilution and Recency Bias: As the context window fills with multi-agent dialogue, the softmax-normalized attention weights spread thin across thousands of tokens. The LLM naturally favors tokens near the beginning or end of its prompt, ignoring vital historical data in the middle.
+2. The "Needle-in-a-Haystack" Loss: Retrieval-Augmented Generation (RAG) mitigates memory saturation by injecting historical raw text chunks back into the prompt. However, as prompt density increases, an agent's reasoning accuracy drops heavily when processing non-contiguous, fragmented memories.
+3. Communication Overhead: Without centralized coordination, multiple agents duplicate information across their respective local context windows. This redundant token processing increases API costs and compute latency.
+
+Flat semantic memory caches fail to solve this problem. They lack the abstraction layers necessary to separate immediate action-items from high-level, global project goals.
+
+1.3 Proposed Solution: The H-MEM Framework
+
+To resolve these bottlenecks, this thesis introduces the Hierarchical Memory Architecture (H-MEM) for Multi-Agent LLM Systems. H-MEM replaces flat token logging with a three-tier, biologically inspired memory hierarchy that decouples local processing from global knowledge management.
+
+```
+       ┌────────────────────────────────────────────────────────┐
+       │         Tier 3: Global Semantic Insight Graph          │
+       │     (Abstracted high-level project goals & truths)     │
+       └───────────────────────────▲────────────────────────────┘
+                                   │  Graph Consolidation
+       ┌───────────────────────────┴────────────────────────────┐
+       │     Tier 2: Coordinated Inter-Agent Index Cache        │
+       │    (Shared, vectorized cross-agent communication)       │
+       └───────────────────────────▲────────────────────────────┘
+                                   │  Vector Eviction / Retrieval
+       ┌───────────────────────────┴────────────────────────────┐
+       │         Tier 1: Local Episodic Scratchpad              │
+       │         (Agent-specific sliding token windows)         │
+       └────────────────────────────────────────────────────────┘
+```
+
+· Tier 1: Local Episodic Scratchpad (M_{ep}): A low-latency, sliding token window reserved exclusively for the agent’s immediate runtime loop, executing local tasks without global noise.
+· Tier 2: Coordinated Inter-Agent Index Cache (M_{idx}): A shared, high-dimensional vector space that compresses and indexes intermediate agent outputs, allowing targeted, semantic retrieval across agents.
+· Tier 3: Global Semantic Insight Graph (M_{glob}): A directed, weighted knowledge graph that continuously condenses transactional data into abstract concepts and universal system states.
+
+By standardizing memory routing through these three distinct mathematical abstractions, H-MEM isolates agents from token saturation while maintaining a persistent, high-fidelity history of the global execution path.
+
+Summary of Core Contributions
+
+1. Mathematical Formalization: A formal framework modeling multi-agent LLM communication as a bounded, state-tracking optimization problem.
+2. Three-Tier Architecture: The design and implementation of the H-MEM memory routing mechanism.
+3. Semantic Drift Mitigation: An algorithmic approach to graph consolidation that prevents long-horizon information decay without human intervention.
