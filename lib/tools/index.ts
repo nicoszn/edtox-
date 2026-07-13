@@ -144,6 +144,7 @@ export function buildEditorTools(documentId: string) {
     class: MermaidBlock
   },
     math: {
+    class: MathBlock,
    inlineToolbar: true,
   },
 
