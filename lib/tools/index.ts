@@ -137,15 +137,16 @@ export function buildEditorTools(documentId: string) {
     class: Underline
   },
   inlineMath: { 
-    class: InlineMathTool 
+    class: InlineMathTool,
+    inlineToolbar: true,
   },
     mermaid: {
     class: MermaidBlock
   },
-    math: {
-    class: MathBlock,
-    inlineToolbar: true,
-  },
+   // math: {
+  //  class: MathBlock,
+   // inlineToolbar: true,
+ // },
 
   // ---------- BLOCK TUNES ----------
   footnotes: {
