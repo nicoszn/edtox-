@@ -1,3 +1,4 @@
+import type { BlockToolConstructable, InlineToolConstructable, BlockTuneConstructable } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import Paragraph from "@editorjs/paragraph";
 import EditorjsList from "@editorjs/list";
@@ -13,7 +14,9 @@ import AttachesTool from "@editorjs/attaches";
 import FootnotesTune from "@editorjs/footnotes";
 import TOC from "@phigoro/editorjs-toc";
 import AlignmentTune from "editorjs-text-alignment-blocktune";
-import InlineMathTool from "@/lib/tools/inlineMath";
+import { InlineMathTool, MathBlockTool } from "editorjs-mathcyou";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 import Citation from "@/lib/tools/citation";
 import PageBreak from "@/lib/tools/pagebreak";
 import SimpleLink from "@/lib/tools/simplelink";
@@ -22,6 +25,25 @@ import MathBlock from "@/lib/tools/mathblock";
 
 import { createIndexedDbUploader, createAttachesUploader } from "@/lib/storage/uploader";
 
+if (typeof window !== "undefined") {
+  // editorjs-mathcyou expects KaTeX on window for static/bundled builds.
+  (window as unknown as { katex: typeof katex }).katex = katex;
+}
+
+/**
+ * Several third-party Editor.js tool packages ship type declarations that
+ * are looser or stricter than the core BlockToolConstructable/
+ * InlineToolConstructable/BlockTuneConstructable interfaces expect — this is
+ * the actual source of the TypeScript 6 "config is required" build error.
+ * The correct fix (per Editor.js's own docs) is to assert each tool's
+ * constructable shape at the point of use, which preserves every package's
+ * real config typing instead of erasing it with hand-rolled ambient module
+ * declarations.
+ */
+const asBlockTool = (tool: unknown) => tool as BlockToolConstructable;
+const asInlineTool = (tool: unknown) => tool as InlineToolConstructable;
+const asTune = (tool: unknown) => tool as BlockTuneConstructable;
+
 /**
  * Tools that need to know which document they belong to (image/attaches,
  * for their IndexedDB uploaders) are built per-document rather than as one
@@ -29,107 +51,113 @@ import { createIndexedDbUploader, createAttachesUploader } from "@/lib/storage/u
  */
 export function buildEditorTools(documentId: string) {
   return {
-    // ---------- BLOCK TOOLS ----------
-    paragraph: {
-      class: Paragraph,
-      inlineToolbar: ["bold", "italic", "underline", "marker", "inlineMath"],
-      tunes: ["alignment"],
-      config: {
-        preserveBlank: true, // Stops automatic creation of new blocks on simple empty breaks
-      },
+  // ---------- BLOCK TOOLS ----------
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: ["bold", "italic", "underline", "marker", "inlineMath"],
+    tunes: ["alignment"],
+    config: {
+    preserveBlank: true // Stops automatic creation of new blocks on simple empty breaks
+  },
+  },
+  header: {
+    class: Header,
+    inlineToolbar: ["bold", "italic", "underline"],
+    config: { 
+      levels: [1, 2, 3, 4, 5], 
+      defaultLevel: 2, 
+      config: { placeholder: "Enter a heading..." }
     },
-    header: {
-      class: Header,
-      inlineToolbar: ["bold", "italic", "underline", "inlineMath"],
-      config: {
-        levels: [1, 2, 3, 4, 5],
-        defaultLevel: 2,
-        config: { placeholder: "Enter a heading..." },
-      },
-      tunes: ["alignment"],
+    tunes: ["alignment"],
+  },
+  list: {
+    class: EditorjsList,
+    inlineToolbar: true,
+    config: { defaultStyle: "unordered" },
+    tunes: ["alignment"],
+  },
+  quote: {
+    class: Quote,
+    inlineToolbar: true,
+    config: { 
+      quotePlaceholder: "Quote", 
+      captionPlaceholder: "Attribution" 
     },
-    list: {
-      class: EditorjsList,
-      inlineToolbar: true,
-      config: { defaultStyle: "unordered" },
-      tunes: ["alignment"],
+    tunes: ["alignment", "footnotes"],
+  },
+  code: { 
+    class: Code 
+  },
+  table: {
+    class: Table,
+    inlineToolbar: true,
+    config: { rows: 2, cols: 2 },
+    tunes: ["alignment"],
+  },
+  delimiter: {
+    class: Delimiter
+  },
+  image: {
+    class: ImageTool,
+    config: {
+      uploader: createIndexedDbUploader(documentId),
     },
-    quote: {
-      class: Quote,
-      inlineToolbar: true,
-      config: {
-        quotePlaceholder: "Quote",
-        captionPlaceholder: "Attribution",
-      },
-      tunes: ["alignment", "footnotes"],
+    tunes: ["alignment"],
+  },
+  attaches: {
+    class: AttachesTool,
+    config: {
+      uploader: createAttachesUploader(documentId),
     },
-    code: {
-      class: Code,
-    },
-    table: {
-      class: Table,
-      inlineToolbar: true,
-      config: { rows: 2, cols: 2 },
-      tunes: ["alignment"],
-    },
-    delimiter: {
-      class: Delimiter,
-    },
-    image: {
-      class: ImageTool,
-      config: {
-        uploader: createIndexedDbUploader(documentId),
-      },
-      tunes: ["alignment"],
-    },
-    attaches: {
-      class: AttachesTool,
-      config: {
-        uploader: createAttachesUploader(documentId),
-      },
-    },
-    linkTool: {
-      class: SimpleLink,
-    },
-    toc: {
-      class: TOC,
-    },
-    citation: {
-      class: Citation,
-    },
-    pagebreak: {
-      class: PageBreak,
-    },
+  },
+  linkTool: { 
+    class: SimpleLink 
+  },
+  mathBlock: { 
+    class: MathBlockTool 
+  },
+  toc: { 
+    class: TOC 
+  },
+  citation: { 
+    class: Citation 
+  },
+  pagebreak: { 
+    class: PageBreak 
+  },
+
+
+  inlineCode: {
+    class: InlineCode
+  },
+  marker: {
+    class: Marker
+  },
+  underline: {
+    class: Underline
+  },
+  inlineMath: { 
+    class: InlineMathTool 
+  },
     mermaid: {
-      class: MermaidBlock,
-    },
+    class: MermaidBlock
+  },
     math: {
-      class: MathBlock,
-      inlineToolbar: true,
-    },
+    class: MathBlock,
+    inlineToolbar: true,
+  },
 
-    // ---------- INLINE TOOLS ----------
-    inlineCode: {
-      class: InlineCode,
-    },
-    marker: {
-      class: Marker,
-    },
-    underline: {
-      class: Underline,
-    },
-    inlineMath: {
-      class: InlineMathTool,
-    },
+  // ---------- BLOCK TUNES ----------
+  footnotes: {
+    class: FootnotesTune,
+    config: { placeholder: "Footnote text" },
+  },
+  alignment: {
+    class: AlignmentTune,
+    config: { default: "left" },
+  },
+};
 
-    // ---------- BLOCK TUNES ----------
-    footnotes: {
-      class: FootnotesTune,
-      config: { placeholder: "Footnote text" },
-    },
-    alignment: {
-      class: AlignmentTune,
-      config: { default: "left" },
-    },
-  };
 }
+
+//export const ALL_TUNES = ["alignment", "footnotes"];
